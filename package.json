@@ -8,7 +8,13 @@
     "platforms": {
       "android": "1.7.0",
       "ios": "1.7.0"
-    }
+    },
+	"plugin": {
+	  "nan": "true",
+	  "pan": "true",
+	  "core3": "false",
+	  "category": "Interface"
+	}
   },
   "repository": {
     "type": "git",
