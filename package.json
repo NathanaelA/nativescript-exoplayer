@@ -1,0 +1,71 @@
+{
+  "name": "nativescript-exoplayer",
+  "version": "1.0.0",
+  "main": "videoplayer",
+  "typings": "videoplayer.d.ts",
+  "description": "A NativeScript plugin that uses the ExoPlayer video player on Android to play local and remote videos.",
+  "nativescript": {
+    "platforms": {
+      "android": "1.7.0",
+      "ios": "1.7.0"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathanaela/nativescript-exoplayer.git"
+  },
+  "keywords": [
+    "NativeScript",
+    "Android",
+    "iOS",
+    "TypeScript",
+    "video",
+    "video player",
+    "movie",
+	"exoplayer"
+  ],
+  "contributors": [
+    {
+      "name": "Nathanael Anderson",
+      "email": "nathan@master-technology",
+      "url": "https://github.com/nathanaela"
+    },
+	{
+	  "name": "Brad Martin",
+	  "email": "bradmartin0905@gmail.com",
+	  "url": "https://github.com/bradmartin"
+	},
+	{
+      "name": "Alexander Ziskind",
+      "email": "alex@nuvious.com",
+      "url": "https://github.com/alexziskind1"
+    },
+    {
+      "name": "Blake Nussey",
+      "email": "blake@stageme.com",
+      "url": "https://github.com/bnussey"
+    },
+    {
+      "name": "Juan Manuel Campos Olvera",
+      "email": "juan4106@hotmail.com",
+      "url": "https://github.com/juanmcampos"
+    },
+    {
+      "name": "Ivo Georgiev",
+      "email": "ivo@strem.io",
+      "url": "https://github.com/Ivshti"
+    }
+  ],
+  "author": {
+	"name": "Nathanael Anderson",
+	"email": "nathan@master-technology",
+	"url": "https://github.com/nathanaela"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/nathanaela/nativescript-exoplayer/issues"
+  },
+  "scripts": {},
+  "homepage": "https://github.com/nathanaela/nativescript-exoplayer",
+  "readmeFilename": "README.md"
+}

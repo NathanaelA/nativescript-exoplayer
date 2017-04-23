@@ -1,0 +1,12 @@
+//default elements
+android {
+    productFlavors {
+        "nativescriptvideoplayer" {
+            dimension "nativescriptvideoplayer"
+        }
+    }
+}
+
+dependencies {
+    compile 'com.google.android.exoplayer:exoplayer:r2.3.1'
+}
