@@ -10,3 +10,7 @@ app/
 !video-source/video-source.d.ts
 tsconfig.json
 README.md
+*.tgz
+.npmignore
+.idea
+*.map
