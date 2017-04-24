@@ -2,7 +2,7 @@ import { Observable } from "data/observable";
 import { Page } from "ui/page";
 import { isAndroid } from "platform";
 import { setInterval } from "timer";
-import { Video } from "nativescript-videoplayer";
+import { Video } from "nativescript-exoplayer";
 
 export class HelloWorldModel extends Observable {
   public videoSrc: string;
