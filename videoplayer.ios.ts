@@ -178,7 +178,7 @@ export class Video extends common.Video {
             this._removePlaybackTimeObserver();
         }
 
-        if (this._observerActive = true) {
+        if (this._observerActive == true) {
             this._removeStatusObserver(this._player.currentItem);
         }
 
