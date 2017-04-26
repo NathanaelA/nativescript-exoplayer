@@ -56,7 +56,7 @@ export class Video extends view.View {
     public static playbackReadyEvent = "playbackReady";
     public static playbackStartEvent = "playbackStart";
     public static seekToTimeCompleteEvent = "seekToTimeComplete";
-    // public static currentTime = "currentTime";
+    public static currentTimeUpdatedEvent = "currentTimeUpdated";
     _emit: any;
 
     public static srcProperty = new dependencyObservable.Property(
@@ -198,4 +198,6 @@ export class Video extends view.View {
     public playbackStartEventCallback() { } //TODO
 
     public seekToTimeCompleteEventCallback() { } //TODO
+
+	public currentTimeUpdatedEventCallback() { } // TODO
 }

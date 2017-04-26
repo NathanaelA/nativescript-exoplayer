@@ -21,7 +21,7 @@ function onVideoSourcePropertyChanged(data: dependencyObservable.PropertyChangeD
 // register the setNativeValue callback
 (<proxy.PropertyMetadata>videoCommon.Video.videoSourceProperty.metadata).onSetNativeValue = onVideoSourcePropertyChanged;
 
-declare const android: any, java: any, com: any;
+declare const android: any, com: any;
 
 const STATE_IDLE: number = 0;
 const SURFACE_WAITING: number = 0;
@@ -31,16 +31,24 @@ const SURFACE_READY: number = 1;
 
 export class Video extends videoCommon.Video {
     private _textureView: any; /// android.widget.VideoView
-    private videoWidth;
-    private videoHeight;
-    private _src;
-    private mediaState;
-    private textureSurface;
-    private mediaPlayer;
-    private mediaController;
-    private preSeekTime;
-	private _android;
-	private _onReadyEmitEvent;
+    private videoWidth: number;
+    private videoHeight: number;
+    private _src: any;
+    private mediaState: number;
+    private textureSurface: any;
+	private textureSurfaceSet: boolean;
+    private mediaPlayer: any;
+    private mediaController: any;
+    private preSeekTime: number;
+	private _android: any;
+	private _onReadyEmitEvent: Array<any>;
+	private videoOpened: boolean;
+	private eventPlaybackReady: boolean;
+	private eventPlaybackStart: boolean;
+	private lastTimerUpdate: number;
+	private interval: number;
+	public TYPE = {DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4};
+
 
     constructor() {
         super();
@@ -54,9 +62,16 @@ export class Video extends videoCommon.Video {
 
         this.mediaState = SURFACE_WAITING;
         this.textureSurface = null;
+		this.textureSurfaceSet = false;
         this.mediaPlayer = null;
         this.mediaController = null;
         this.preSeekTime = -1;
+
+		this.videoOpened = false;
+		this.eventPlaybackReady = false;
+		this.eventPlaybackStart = false;
+		this.lastTimerUpdate = -1;
+		this.interval = null;
     }
 
     get playState(): any {
@@ -67,6 +82,30 @@ export class Video extends videoCommon.Video {
     get android(): any {
         return this._android;
     }
+
+    private _setupTextureSurface(): void {
+		if (!this.textureSurface) {
+			if (!this._textureView.isAvailable()) {
+				return;
+			}
+			this.textureSurface = new android.view.Surface(this._textureView.getSurfaceTexture());
+		}
+		if (this.textureSurface) {
+			if (!this.mediaPlayer) {
+				return;
+			}
+			if (!this.textureSurfaceSet) {
+				this.mediaPlayer.setVideoSurface(this.textureSurface);
+				this.mediaState = SURFACE_READY;
+			} else {
+				this.mediaState = SURFACE_WAITING;
+			}
+
+			if (!this.videoOpened) {
+				this._openVideo();
+			}
+		}
+	}
 
     public _createUI(): void {
         let that = new WeakRef(this);
@@ -82,7 +121,9 @@ export class Video extends videoCommon.Video {
                 return that.get();
             },
             onTouch: function (/* view, event */) {
-                this.owner.toggleMediaControllerVisibility();
+            	if (this.owner) {
+					this.owner.toggleMediaControllerVisibility();
+				}
                 return false;
             }
         }));
@@ -92,20 +133,22 @@ export class Video extends videoCommon.Video {
                 get owner(): Video {
                     return that.get();
                 },
-                onSurfaceTextureSizeChanged: function (surface, width, height) {
+                onSurfaceTextureSizeChanged: function (/* surface, width, height */) {
                     //console.log("SurfaceTexutureSizeChange", width, height);
                     // do nothing
                 },
 
-                onSurfaceTextureAvailable: function (surface /*, width, height */) {
-                    this.owner.textureSurface = new android.view.Surface(surface);
-                    this.owner.mediaState = SURFACE_WAITING;
-                    this.owner._openVideo();
+                onSurfaceTextureAvailable: function (/* surface, width, height */) {
+                	if (this.owner) {
+						this.owner._setupTextureSurface();
+					}
                 },
 
                 onSurfaceTextureDestroyed: function (/* surface */) {
                     // after we return from this we can't use the surface any more
+					if (!this.owner) { return true; }
                     if (this.owner.textureSurface !== null) {
+						this.owner.textureSurfaceSet = false;
                         this.owner.textureSurface.release();
                         this.owner.textureSurface = null;
                     }
@@ -137,15 +180,18 @@ export class Video extends videoCommon.Video {
         let that = new WeakRef(this);
 
 		let vidListener = new com.google.android.exoplayer2.SimpleExoPlayer.VideoListener({
-
-			get owner() {
+			get owner(): Video {
 				return that.get();
 			},
 			onRenderedFirstFrame: function () {
 				// Once the first frame has rendered it is ready to start playing...
-				this.owner._emit(videoCommon.Video.playbackReadyEvent);
+				if (this.owner && !this.owner.eventPlaybackReady)
+				{
+					this.owner.eventPlaybackReady = true;
+					this.owner._emit(videoCommon.Video.playbackReadyEvent);
+				}
 			},
-			onVideoSizeChanged: function (width, height, unappliedRotationDegrees, pixelWidthHeightRatio) {
+			onVideoSizeChanged: function (width, height /*, unappliedRotationDegrees, pixelWidthHeightRatio */) {
 				if (this.owner) {
 					this.owner.videoWidth = width;
 					this.owner.videoHeight = height;
@@ -156,43 +202,60 @@ export class Video extends videoCommon.Video {
 			}
 		});
 		let evtListener = new com.google.android.exoplayer2.ExoPlayer.EventListener({
-			get owner() {
+			get owner(): Video {
 				return that.get();
 			},
-			onLoadingChanged: function(isLoading) {
-
+			onLoadingChanged: function(/* isLoading */) {
+				// Do nothing
 			},
 			onPlayerError: function(error) {
-
+				console.error("PlayerError", error);
 			},
 			onPlayerStateChanged: function(playWhenReady, playbackState) {
+				// console.log("OnPlayerStateChanged", playWhenReady, playbackState);
+				if (!this.owner) { return; }
+				if (!this.owner.textureSurfaceSet) {
+					this.owner._setupTextureSurface();
+				}
+
 				// PlayBackState
 				// 1 = IDLE
 				// 2 = BUFFERING
 				// 3 = Ready
 				// 4 = Ended
-				// Ready
+
 				if (playbackState === 3) {
-					if (this.owner && this.owner._onReadyEmitEvent.length) {
+
+					// We have to fire this from here in the event the textureSurface isn't set yet...
+					if (!this.owner.textureSurfaceSet && !this.owner.eventPlaybackReady) {
+						this.owner.eventPlaybackReady = true;
+						this.owner._emit(videoCommon.Video.playbackReadyEvent);
+					}
+					if (this.owner._onReadyEmitEvent.length) {
 						do {
 							this.owner._emit(this.owner._onReadyEmitEvent.shift());
 						} while (this.owner._onReadyEmitEvent.length);
 					}
-
-				} else if (playbackState === 4) {
+					if (playWhenReady && !this.owner.eventPlaybackStart) {
+						this.owner.eventPlaybackStart = true;
+						this.owner._emit(videoCommon.Video.playbackStartEvent);
+					}
+				}
+				else if (playbackState === 4) {
+					this.owner.eventPlaybackStart = false;
+					this.owner.stopCurrentTimer();
 					this.owner._emit(videoCommon.Video.finishedEvent);
 				}
-				//console.log("OPSC", playWhenReady, playbackState);
 
 			},
 			onPositionDiscontinuity: function() {
-
+				// Do nothing
 			},
-			onTimelineChanged: function(timeline, manifest) {
-
+			onTimelineChanged: function(/* timeline, manifest */) {
+				// Do nothing
 			},
-			onTracksChanged: function(trackGroups, trackSelections) {
-
+			onTracksChanged: function(/* trackGroups, trackSelections */) {
+				// Do nothing
 			}
 		});
 		this.mediaPlayer.setVideoListener(vidListener);
@@ -247,11 +310,27 @@ export class Video extends videoCommon.Video {
 
     }
 
+    private _detectTypeFromSrc(uri: any): number {
+    	let type = com.google.android.exoplayer2.util.Util.inferContentType(uri);
+		switch (type) {
+			case 0: return this.TYPE.DASH;
+			case 1: return this.TYPE.SS;
+			case 2: return this.TYPE.HLS;
+			default: return this.TYPE.OTHER;
+		}
+	}
+
     private _openVideo(): void {
-		if (this._src === null || this.textureSurface === null) {
+		if (this._src === null) {
 			return;
 		}
 		this.release();
+
+		if (!this.interval) {
+			this.startCurrentTimer();
+		}
+
+		this.videoOpened = true; // we don't want to come back in here from texture system...
 
 		let am = utils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
 		am.requestAudioFocus(null, android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.AUDIOFOCUS_GAIN);
@@ -262,23 +341,74 @@ export class Video extends videoCommon.Video {
 			let loadControl = new com.google.android.exoplayer2.DefaultLoadControl();
 			this.mediaPlayer =
 				com.google.android.exoplayer2.ExoPlayerFactory.newSimpleInstance(this._context, trackSelector, loadControl);
-			this.mediaPlayer.setVideoSurface(this.textureSurface);
+
+			if (this.textureSurface && !this.textureSurfaceSet) {
+				this.textureSurfaceSet = true;
+				this.mediaPlayer.setVideoSurface(this.textureSurface);
+			} else {
+				this._setupTextureSurface();
+			}
+
 			let dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
 			let ef = new com.google.android.exoplayer2.extractor.DefaultExtractorsFactory();
 
-			let vs;
+			let vs, uri;
 			if (this._src instanceof String || typeof this._src === "string") {
-				let uri = android.net.Uri.parse(this._src);
-				vs = new com.google.android.exoplayer2.source.ExtractorMediaSource(uri, dsf, ef, null, null, null);
+				uri = android.net.Uri.parse(this._src);
+
+				const type = this._detectTypeFromSrc(this._src);
+				switch (type) {
+					case this.TYPE.SS:
+						vs = new com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource(uri, dsf,
+							new com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource.Factory(dsf), null, null);
+						break;
+					case this.TYPE.DASH:
+						vs = new com.google.android.exoplayer2.source.dash.DashMediaSource(uri, dsf,
+							new com.google.android.exoplayer2.source.dash.DefaultDashChunkSource.Factory(dsf), null, null);
+						break;
+					case this.TYPE.HLS:
+						vs = new com.google.android.exoplayer2.source.hls.HlsMediaSource(uri, dsf, null, null);
+						break;
+					default:
+						vs = new com.google.android.exoplayer2.source.ExtractorMediaSource(uri, dsf, ef, null, null, null);
+				}
 
 				if (this.loop) {
 					vs = new com.google.android.exoplayer2.source.LoopingMediaSource(vs);
 				}
+			}
+			else if (typeof this._src.typeSource === "number" )
+			{
+				uri = android.net.Uri.parse(this._src.url);
+				switch (this._src.typeSource) {
+					case this.TYPE.SS:
+						vs = new com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource(uri, dsf,
+							new com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource.Factory(dsf), null, null);
+						break;
+					case this.TYPE.DASH:
+						vs = new com.google.android.exoplayer2.source.dash.DashMediaSource(uri, dsf,
+							new com.google.android.exoplayer2.source.dash.DefaultDashChunkSource.Factory(dsf), null, null);
+						break;
+					case this.TYPE.HLS:
+						vs = new com.google.android.exoplayer2.source.hls.HlsMediaSource(uri, dsf, null, null);
+						break;
+					default:
+						vs = new com.google.android.exoplayer2.source.ExtractorMediaSource(uri, dsf, ef, null, null, null);
+				}
+
+				if (this.loop) {
+					vs = new com.google.android.exoplayer2.source.LoopingMediaSource(vs);
+				}
+
+
 			} else {
 				vs = this._src;
 			}
 
-			this.mediaController.setPlayer(this.mediaPlayer);
+			if (this.mediaController) {
+				this.mediaController.setPlayer(this.mediaPlayer);
+			}
+
 			this._setupMediaPlayerListeners();
 			this.mediaPlayer.prepare(vs);
 			if (this.autoplay === true) {
@@ -307,13 +437,17 @@ export class Video extends videoCommon.Video {
     }
 
     public play(): void {
+		if (!this.mediaPlayer) { return; }
 		if (this.mediaState === SURFACE_WAITING) {
 			this._openVideo();
 		}
 		else if (this.playState === 4) {
+			this.eventPlaybackStart = false;
 			this.mediaPlayer.seekToDefaultPosition();
+			this.startCurrentTimer();
 		} else {
 			this.mediaPlayer.setPlayWhenReady(true);
+			this.startCurrentTimer();
 		}
     }
 
@@ -336,6 +470,7 @@ export class Video extends videoCommon.Video {
 
     public stop(): void {
 		if (this.mediaPlayer) {
+			this.stopCurrentTimer();
 			this.mediaPlayer.stop();
 			this.release();
 		}
@@ -381,7 +516,9 @@ export class Video extends videoCommon.Video {
     }
 
     public setVolume(volume: number) {
-        this.mediaPlayer.setVolume(volume);
+    	if (this.mediaPlayer) {
+			this.mediaPlayer.setVolume(volume);
+		}
     }
 
     public destroy() {
@@ -393,6 +530,12 @@ export class Video extends videoCommon.Video {
     }
 
     private release(): void {
+		this.stopCurrentTimer();
+		this.videoOpened = false;
+		this.eventPlaybackReady = false;
+		this.eventPlaybackStart = false;
+		this.textureSurfaceSet = false;
+
 		if (this.mediaPlayer !== null) {
 			this.mediaState = SURFACE_WAITING;
 			this.mediaPlayer.release();
@@ -412,5 +555,39 @@ export class Video extends videoCommon.Video {
     public resumeEvent(): void {
         this._openVideo();
     }
+
+	private startCurrentTimer(): void {
+		if (this.interval) {
+			return;
+		}
+		this.lastTimerUpdate = -1;
+		this.interval = setInterval(() => {
+			this.fireCurrentTimeEvent();
+		}, 1000);
+	}
+
+	private fireCurrentTimeEvent(): void {
+		if (!this.mediaPlayer) {
+			return;
+		}
+		let curTimer = this.mediaPlayer.getCurrentPosition();
+		if (curTimer !== this.lastTimerUpdate) {
+			this.notify({
+				eventName: videoCommon.Video.currentTimeUpdatedEvent,
+				object: this,
+				position: curTimer
+			});
+			this.lastTimerUpdate = curTimer;
+		}
+	}
+
+	private stopCurrentTimer(): void {
+		if (this.interval) {
+			clearInterval(this.interval);
+			this.interval = null;
+		}
+		this.fireCurrentTimeEvent();
+	}
+
 
 }
