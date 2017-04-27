@@ -105,11 +105,16 @@ Attribute to specify an event callback to execute when the video has finished se
 
 - **observeCurrentTime - (boolean)** - *optional*
 
-Sets if observables on currentTime are created.
+If set to true, currentTimeUpdated callback is possible.
 
-- **playbackStarted - (function)** - *optional* **IOS ONLY**
+- **playbackStarted - (function)** - *optional*
 
 Attribute to specify an event callback to execute when the video has started playing.
+
+- **currentTimeUpdated - (function)** - *optional*
+
+Attribute to specify an event callback to execute when the time is updated.
+
 
 ## API
 
@@ -125,10 +130,6 @@ Attribute to specify an event callback to execute when the video has started pla
 ### Android only
 
 - **stop()** - Stop the playback - this resets the player and remove the video src
-
-## Observable Properties
-
-- **currentTime()** - Current time of video.
 
 
 ### Contributors

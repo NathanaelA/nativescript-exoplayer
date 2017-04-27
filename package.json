@@ -1,6 +1,6 @@
 {
   "name": "nativescript-exoplayer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "videoplayer",
   "typings": "videoplayer.d.ts",
   "description": "A NativeScript plugin that uses the ExoPlayer video player on Android to play local and remote videos.",

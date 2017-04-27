@@ -83,12 +83,6 @@ export class Video extends view.View {
         new proxy.PropertyMetadata(false, dependencyObservable.PropertyMetadataSettings.None)
     );
 
-    public static currentTimeProperty = new dependencyObservable.Property(
-        CURRENTTIME,
-        VIDEO,
-        new proxy.PropertyMetadata(false, dependencyObservable.PropertyMetadataSettings.None)
-    );
-
     public static autoplayProperty = new dependencyObservable.Property(
         AUTOPLAY,
         VIDEO,
@@ -146,10 +140,6 @@ export class Video extends view.View {
 
     set observeCurrentTime(value: number) {
         this._setValue(Video.observeCurrentTimeProperty, value);
-    }
-
-    get currentTime(): number {
-        return this._getValue(Video.currentTimeProperty);
     }
 
     get autoplay(): any {

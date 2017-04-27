@@ -115,7 +115,6 @@ export class Video extends common.Video {
         if (this.observeCurrentTime && !this._playbackTimeObserverActive) {
             this._addPlaybackTimeObserver();
         }
-
     }
 
     private AVPlayerItemDidPlayToEndTimeNotification(notification: any) {
@@ -132,6 +131,7 @@ export class Video extends common.Video {
     }
 
     public play() {
+
         this._player.play();
     }
 
@@ -178,7 +178,7 @@ export class Video extends common.Video {
             this._removePlaybackTimeObserver();
         }
 
-        if (this._observerActive == true) {
+        if (this._observerActive) {
             this._removeStatusObserver(this._player.currentItem);
         }
 
@@ -233,7 +233,11 @@ export class Video extends common.Video {
         this._playbackTimeObserver = this._player.addPeriodicTimeObserverForIntervalQueueUsingBlock(_interval, null, (currentTime) => {
             let _seconds = CMTimeGetSeconds(currentTime);
             let _milliseconds = _seconds * 1000.0;
-            this._setValue(Video.currentTimeProperty, _milliseconds);
+            this.notify({
+                eventName: Video.currentTimeUpdatedEvent,
+                object: this,
+                position: _milliseconds
+            });
         })
     }
 

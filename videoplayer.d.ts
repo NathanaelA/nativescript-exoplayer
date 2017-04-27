@@ -94,7 +94,7 @@ export declare class Video extends View {
     playbackReady(callback: Function): void;
 
     /**
-     * *** IOS ONLY ***
+     * 
      * Callback to execute when the video is playing.
      * @param {function} callback - The callback function to execute.
     */
@@ -105,5 +105,11 @@ export declare class Video extends View {
      * @param {function} callback - The callback function to execute.
     */
     seekToTimeComplete(callback: Function): void;
+
+    /**
+        * Callback to execute when the time is updated.
+        * @param {function} callback - The callback function to execute.
+    */
+    currentTimeUpdated(callback: Function): void;
 
 }
