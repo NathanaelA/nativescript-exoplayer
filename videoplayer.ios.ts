@@ -1,4 +1,5 @@
 ﻿import common = require("./videoplayer-common");
+import { videoSourceProperty } from "./videoplayer-common";
 import dependencyObservable = require("ui/core/dependency-observable");
 import proxy = require("ui/core/proxy");
 import utils = require("utils/utils")
@@ -7,9 +8,9 @@ import view = require("ui/core/view");
 import definition = require("./videoplayer");
 import application = require('application');
 
+export * from "./videoplayer-common";
+
 declare const NSURL, AVPlayer, AVPlayerItem, NSObjectAVPlayer, AVPlayerViewController, AVPlayerItemDidPlayToEndTimeNotification, UIView, CMTimeMakeWithSeconds, NSNotification, NSNotificationCenter, CMTimeGetSeconds, CMTimeMake, kCMTimeZero, AVPlayerItemStatusReadyToPlay, AVAsset;
-
-
 
 global.moduleMerge(common, exports);
 
@@ -19,7 +20,7 @@ function onVideoSourcePropertyChanged(data: dependencyObservable.PropertyChangeD
 }
 
 // register the setNativeValue callback
-(<proxy.PropertyMetadata>common.Video.videoSourceProperty.metadata).onSetNativeValue = onVideoSourcePropertyChanged;
+// (<proxy.PropertyMetadata>common.Video.videoSourceProperty.metadata).onSetNativeValue = onVideoSourcePropertyChanged;
 
 export class Video extends common.Video {
     private _player: any; /// AVPlayer
@@ -51,6 +52,14 @@ export class Video extends common.Video {
 
     get ios(): any {
         return this._ios;
+    }
+
+    [videoSourceProperty.getDefault](): AVPlayerItem {
+        console.log("videoSourceProperty");
+        return '';
+    }
+    [videoSourceProperty.setNative](value: AVPlayerItem) {
+        console.log("value", value);
     }
 
     public _setNativeVideo(nativeVideoPlayer: any) {

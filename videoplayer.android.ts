@@ -107,7 +107,7 @@ export class Video extends videoCommon.Video {
 		}
 	}
 
-	public _createUI(): void {
+	public createNativeView(): void {
 		let that = new WeakRef(this);
 		this._android = new android.widget.RelativeLayout(this._context);
 		this._textureView = new android.view.TextureView(this._context);
