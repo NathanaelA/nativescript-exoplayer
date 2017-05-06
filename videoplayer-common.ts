@@ -12,8 +12,8 @@ import { View, Property, booleanConverter } from "ui/core/view";
 
 function onSrcPropertyChanged(view, oldValue, newValue) {
 
-    var video = view;
-    var value = newValue;
+    const video = view;
+    let value = newValue;
 
     if (types.isString(value)) {
         value = value.trim();
@@ -62,18 +62,12 @@ export class Video extends View {
 
 export const srcProperty = new Property<Video, any>({
     name: "src",
-    valueConverter: (v) => v,
-    valueChanged: (target, oldValue, newValue) => {
-        onSrcPropertyChanged(target, oldValue, newValue);
-    },
+    valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
 
 export const videoSourceProperty = new Property<Video, any>({
-    name: "videoSource",
-    valueChanged: (target, oldValue, newValue) => {
-        console.log("videoSourceProperty", target, oldValue, newValue);
-    },
+    name: "videoSource"
 });
 videoSourceProperty.register(Video);
 
