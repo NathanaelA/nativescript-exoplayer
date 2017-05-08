@@ -1,8 +1,8 @@
 ﻿import videoCommon = require("./videoplayer-common");
-import { videoSourceProperty } from "./videoplayer-common";
-import view = require("ui/core/view");
 import definition = require("./videoplayer");
 import application = require('application');
+import { ios } from "application"
+import { videoSourceProperty } from "./videoplayer-common";
 
 export * from "./videoplayer-common";
 
@@ -49,6 +49,7 @@ export class Video extends videoCommon.Video {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
             this._autoplayCheck();
+            this._videoFinished = false;
             if (currentItem !== null) {
                 this._videoLoaded = false;
                 this._videoPlaying = false;
@@ -94,8 +95,9 @@ export class Video extends videoCommon.Video {
             this._player.muted = true;
         }
 
+
         if (!this._didPlayToEndTimeActive) {
-            this._didPlayToEndTimeObserver = application.ios.addNotificationObserver(AVPlayerItemDidPlayToEndTimeNotification, this.AVPlayerItemDidPlayToEndTimeNotification.bind(this));
+            this._didPlayToEndTimeObserver = ios.addNotificationObserver(AVPlayerItemDidPlayToEndTimeNotification, this.AVPlayerItemDidPlayToEndTimeNotification.bind(this));
             this._didPlayToEndTimeActive = true;
         }
 
@@ -106,6 +108,7 @@ export class Video extends videoCommon.Video {
             // This will match exactly to the object from the notification so can ensure only looping and finished event for the video that has finished.
             // Notification is structured like so: NSConcreteNotification 0x61000024f690 {name = AVPlayerItemDidPlayToEndTimeNotification; object = <AVPlayerItem: 0x600000204190, asset = <AVURLAsset: 0x60000022b7a0, URL = https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4>>}
             this._emit(videoCommon.Video.finishedEvent);
+            this._videoFinished = true;
             if (this.loop === true && this._player !== null) {
                 // Go in 5ms for more seamless looping
                 this.seekToTime(CMTimeMake(5, 100));
@@ -115,9 +118,15 @@ export class Video extends videoCommon.Video {
     }
 
     public play() {
+        if (this._videoFinished) {
+            this._videoFinished = false;
+            this.seekToTime(CMTimeMake(5, 100));
+        }
+
         if (this.observeCurrentTime && !this._playbackTimeObserverActive) {
             this._addPlaybackTimeObserver();
         }
+
         this._player.play();
     }
 
@@ -159,7 +168,7 @@ export class Video extends videoCommon.Video {
 
     public destroy() {
         if (this._didPlayToEndTimeActive) {
-            application.ios.removeNotificationObserver(this._didPlayToEndTimeObserver, AVPlayerItemDidPlayToEndTimeNotification);
+            ios.removeNotificationObserver(this._didPlayToEndTimeObserver, AVPlayerItemDidPlayToEndTimeNotification);
             this._didPlayToEndTimeActive = false;
         }
 

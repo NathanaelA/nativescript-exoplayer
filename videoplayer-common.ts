@@ -1,10 +1,7 @@
-﻿// import dependencyObservable = require("ui/core/dependency-observable");
-import videoSource = require("./video-source/video-source");
+﻿import videoSource = require("./video-source/video-source");
 import * as definitions from "./index";
-import enums = require("ui/enums");
-import platform = require("platform");
-import utils = require("utils/utils");
-import * as types from "utils/types";
+import { isFileOrResourcePath } from "utils/utils"
+import { isString } from "utils/types"
 import { View, Property, booleanConverter } from "ui/core/view";
 
 // on Android we explicitly set propertySettings to None because android will invalidate its layout (skip unnecessary native call).
@@ -15,12 +12,12 @@ function onSrcPropertyChanged(view, oldValue, newValue) {
     const video = view;
     let value = newValue;
 
-    if (types.isString(value)) {
+    if (isString(value)) {
         value = value.trim();
         video.videoSource = null;
         video["_url"] = value;
         video.isLoadingProperty = true;
-        if (utils.isFileOrResourcePath(value)) {
+        if (isFileOrResourcePath(value)) {
             video.videoSource = videoSource.fromFileOrResource(value);
             video.isLoadingProperty = false;
         } else {
