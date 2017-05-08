@@ -1,20 +1,20 @@
 {
   "name": "nativescript-exoplayer",
-  "version": "1.0.4",
+  "version": "3.0.0",
   "main": "videoplayer",
-  "typings": "videoplayer.d.ts",
+  "typings": "index.d.ts",
   "description": "A NativeScript plugin that uses the ExoPlayer video player on Android to play local and remote videos.",
   "nativescript": {
     "platforms": {
-      "android": "1.7.0",
-      "ios": "1.7.0"
+      "android": "3.0.0",
+      "ios": "3.0.0"
     },
-	"plugin": {
-	  "nan": "true",
-	  "pan": "true",
-	  "core3": "false",
-	  "category": "Interface"
-	}
+    "plugin": {
+      "nan": "true",
+      "pan": "true",
+      "core3": "false",
+      "category": "Interface"
+    }
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "video",
     "video player",
     "movie",
-	"exoplayer"
+    "exoplayer"
   ],
   "contributors": [
     {
@@ -36,12 +36,12 @@
       "email": "nathan@master-technology",
       "url": "https://github.com/nathanaela"
     },
-	{
-	  "name": "Brad Martin",
-	  "email": "bradmartin0905@gmail.com",
-	  "url": "https://github.com/bradmartin"
-	},
-	{
+    {
+      "name": "Brad Martin",
+      "email": "bradmartin0905@gmail.com",
+      "url": "https://github.com/bradmartin"
+    },
+    {
       "name": "Alexander Ziskind",
       "email": "alex@nuvious.com",
       "url": "https://github.com/alexziskind1"
@@ -63,15 +63,25 @@
     }
   ],
   "author": {
-	"name": "Nathanael Anderson",
-	"email": "nathan@master-technology",
-	"url": "https://github.com/nathanaela"
+    "name": "Nathanael Anderson",
+    "email": "nathan@master-technology",
+    "url": "https://github.com/nathanaela"
   },
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/nathanaela/nativescript-exoplayer/issues"
   },
-  "scripts": {},
+  "scripts": {
+    "prepublish": "tsc"
+  },
   "homepage": "https://github.com/nathanaela/nativescript-exoplayer",
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "tns-core-modules": "^3.0.0",
+    "tns-platform-declarations": "^3.0.0",
+    "typescript": "^2.2.2"
+  },
+  "peerDependencies": {
+    "tns-core-modules": "^3.0.0"
+  }
 }
