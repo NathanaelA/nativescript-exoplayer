@@ -223,7 +223,7 @@ export class Video extends videoCommon.Video {
 					}
 					if (playWhenReady && !this.owner.eventPlaybackStart) {
 						this.owner.eventPlaybackStart = true;
-						this.owner._emit(videoCommon.Video.playbackStartEvent);
+						// this.owner._emit(videoCommon.Video.playbackStartEvent);
 					}
 				}
 				else if (playbackState === 4) {
