@@ -1,33 +1,16 @@
 ﻿import videoCommon = require("./videoplayer-common");
+import { videoSourceProperty } from "./videoplayer-common";
 import videoSource = require("./video-source/video-source");
-import dependencyObservable = require("ui/core/dependency-observable");
-import proxy = require("ui/core/proxy");
-import utils = require("utils/utils");
 import timer = require("timer");
+import utils = require("utils/utils");
 
-/* global com */
-
-global.moduleMerge(videoCommon, exports);
-
-function onVideoSourcePropertyChanged(data: dependencyObservable.PropertyChangeData) {
-	let video = <Video>data.object;
-	if (!video.android) {
-		return;
-	}
-
-	video._setNativeVideo(data.newValue ? data.newValue.android : null);
-}
-
-// register the setNativeValue callback
-(<proxy.PropertyMetadata>videoCommon.Video.videoSourceProperty.metadata).onSetNativeValue = onVideoSourcePropertyChanged;
+export * from "./videoplayer-common";
 
 declare const android: any, com: any;
 
 const STATE_IDLE: number = 0;
 const SURFACE_WAITING: number = 0;
 const SURFACE_READY: number = 1;
-
-
 
 export class Video extends videoCommon.Video {
 	private _textureView: any; /// android.widget.VideoView
@@ -40,7 +23,6 @@ export class Video extends videoCommon.Video {
 	private mediaPlayer: any;
 	private mediaController: any;
 	private preSeekTime: number;
-	private _android: any;
 	private _onReadyEmitEvent: Array<any>;
 	private videoOpened: boolean;
 	private eventPlaybackReady: boolean;
@@ -48,12 +30,12 @@ export class Video extends videoCommon.Video {
 	private lastTimerUpdate: number;
 	private interval: number;
 	public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
-
+	public nativeView: any;
 
 	constructor() {
 		super();
 		this._textureView = null;
-		this._android = null;
+		this.nativeView = null;
 		this.videoWidth = 0;
 		this.videoHeight = 0;
 		this._onReadyEmitEvent = [];
@@ -80,7 +62,11 @@ export class Video extends videoCommon.Video {
 	}
 
 	get android(): any {
-		return this._android;
+		return this.nativeView;
+	}
+
+	[videoSourceProperty.setNative](value) {
+		this._setNativeVideo(value ? value.android : null);
 	}
 
 	private _setupTextureSurface(): void {
@@ -107,14 +93,14 @@ export class Video extends videoCommon.Video {
 		}
 	}
 
-	public createNativeView(): void {
+	public initNativeView(): void {
 		let that = new WeakRef(this);
-		this._android = new android.widget.RelativeLayout(this._context);
+		this.nativeView = new android.widget.RelativeLayout(this._context);
 		this._textureView = new android.view.TextureView(this._context);
 		this._textureView.setFocusable(true);
 		this._textureView.setFocusableInTouchMode(true);
 		this._textureView.requestFocus();
-		this._android.addView(this._textureView);
+		this.nativeView.addView(this._textureView);
 		this._setupMediaController();
 		this._textureView.setOnTouchListener(new android.view.View.OnTouchListener({
 			get owner(): Video {
@@ -266,7 +252,7 @@ export class Video extends videoCommon.Video {
 		if (this.controls !== false || this.controls === undefined) {
 			if (this.mediaController == null) {
 				this.mediaController = new com.google.android.exoplayer2.ui.PlaybackControlView(this._context);
-				this._android.addView(this.mediaController);
+				this.nativeView.addView(this.mediaController);
 
 				let params = this.mediaController.getLayoutParams();
 				params.addRule(14); // Center Horiz

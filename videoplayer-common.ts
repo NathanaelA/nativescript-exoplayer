@@ -12,26 +12,20 @@ import { View, Property, booleanConverter } from "ui/core/view";
 
 function onSrcPropertyChanged(view, oldValue, newValue) {
 
-    var video = view;
-    var value = newValue;
+    const video = view;
+    let value = newValue;
 
     if (types.isString(value)) {
         value = value.trim();
         video.videoSource = null;
         video["_url"] = value;
-
         video.isLoadingProperty = true;
-
         if (utils.isFileOrResourcePath(value)) {
-            console.log("utils.isFileOrResourcePath(value)", utils.isFileOrResourcePath(value));
-            console.log("video.videoSource", video.videoSource);
             video.videoSource = videoSource.fromFileOrResource(value);
-            console.log("video.videoSource", video.videoSource);
             video.isLoadingProperty = false;
         } else {
             if (video["_url"] === value) {
                 video.videoSource = videoSource.fromUrl(value);
-
                 video.isLoadingProperty = false;
             }
         }
@@ -54,26 +48,22 @@ export class Video extends View {
     public android: any;
     public ios: any;
     public src: string; /// video source file
-    public loop: boolean = false; /// whether the video loops the playback after extends
+    public observeCurrentTime: boolean; // set to true if want to observe current time.
     public autoplay: boolean = false; /// set true for the video to start playing when ready
     public controls: boolean = true; /// set true to enable the media player's playback controls
-    public observeCurrentTime: boolean; // set to true if want to observe current time.
+    public loop: boolean = false; /// whether the video loops the playback after extends
+    public muted: boolean = false;
+    public fill: boolean = false;
 }
 
 export const srcProperty = new Property<Video, any>({
     name: "src",
-    valueConverter: (v) => v,
-    valueChanged: (target, oldValue, newValue) => {
-        onSrcPropertyChanged(target, oldValue, newValue);
-    },
+    valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
 
 export const videoSourceProperty = new Property<Video, any>({
     name: "videoSource",
-    valueChanged: (target, oldValue, newValue) => {
-        console.log("videoSourceProperty", target, oldValue, newValue);
-    },
 });
 videoSourceProperty.register(Video);
 
