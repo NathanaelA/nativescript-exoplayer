@@ -547,7 +547,7 @@ export class Video extends videoCommon.Video {
 		this.lastTimerUpdate = -1;
 		this.interval = setInterval(() => {
 			this.fireCurrentTimeEvent();
-		}, 1000);
+		}, 200);
 	}
 
 	private fireCurrentTimeEvent(): void {
