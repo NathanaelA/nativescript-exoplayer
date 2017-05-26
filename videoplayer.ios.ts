@@ -110,8 +110,8 @@ export class Video extends videoCommon.Video {
             this._videoFinished = true;
             if (this.loop === true && this._player !== null) {
                 // Go in 5ms for more seamless looping
-                this.seekToTime(CMTimeMake(5, 100));
-                this.play();
+                this._player.seekToTime(CMTimeMake(5, 100));
+                this._player.play();
             }
         }
     }
@@ -181,6 +181,7 @@ export class Video extends videoCommon.Video {
         this.pause();
         this._player.replaceCurrentItemWithPlayerItem(null); //de-allocates the AVPlayer
         this._playerController = null;
+        this._player = null;
     }
 
     private _addStatusObserver(currentItem) {
