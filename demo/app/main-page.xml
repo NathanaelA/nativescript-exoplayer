@@ -1,6 +1,6 @@
 <Page
   xmlns="http://schemas.nativescript.org/tns.xsd"
-  xmlns:Video="nativescript-exoplayer" loaded="pageLoaded">
+  xmlns:Video="./videoplayer" loaded="pageLoaded">
   <ActionBar title="Native Video" />
   <ScrollView>
     <StackLayout>
@@ -12,7 +12,7 @@
         <Label col="3" text="{{ videoDuration }}" class="message" textWrap="true" />
       </GridLayout>
       <GridLayout rows="*" columns="*, *" backgroundColor="#000000">
-        <Video:Video id="nativeVideoPlayer" controls="true" loadingComplete="{{ videoCompleted }}" finished="{{ videoFinished }}" loop="false" autoplay="true" height="280" src="{{ videoSrc }}" row="0" colSpan="2"/>
+        <Video:Video id="nativeVideoPlayer" controls="true" loadingComplete="{{ videoCompleted }}" playbackStart="{{ playbackStart }}" finished="{{ videoFinished }}" loop="false" autoplay="true" height="280" src="{{ videoSrc }}" row="0" colSpan="2"/>
         <Label text="Label On Top of Video View" row="0" colSpan="2" color="#fff" horizontalAlignment="center"/>
       </GridLayout>
       <StackLayout orientation="horizontal">

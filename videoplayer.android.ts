@@ -1,7 +1,7 @@
 ﻿import videoCommon = require("./videoplayer-common");
 import { videoSourceProperty } from "./videoplayer-common";
-import videoSource = require("./video-source/video-source");
-import timer = require("timer");
+//import videoSource = require("./video-source/video-source");
+//import timer = require("timer");
 import utils = require("utils/utils");
 
 export * from "./videoplayer-common";
@@ -227,9 +227,14 @@ export class Video extends videoCommon.Video {
 					}
 				}
 				else if (playbackState === 4) {
-					this.owner.eventPlaybackStart = false;
-					this.owner.stopCurrentTimer();
+					if (!this.owner.loop) {
+						this.owner.eventPlaybackStart = false;
+						this.owner.stopCurrentTimer();
+					}
 					this.owner._emit(videoCommon.Video.finishedEvent);
+					if (this.owner.loop) {
+						this.play();
+					}
 				}
 
 			},
@@ -358,9 +363,9 @@ export class Video extends videoCommon.Video {
 						vs = new com.google.android.exoplayer2.source.ExtractorMediaSource(uri, dsf, ef, null, null, null);
 				}
 
-				if (this.loop) {
+				/* if (this.loop) {
 					vs = new com.google.android.exoplayer2.source.LoopingMediaSource(vs);
-				}
+				} */
 			}
 			else if (typeof this._src.typeSource === "number") {
 				uri = android.net.Uri.parse(this._src.url);
@@ -380,9 +385,9 @@ export class Video extends videoCommon.Video {
 						vs = new com.google.android.exoplayer2.source.ExtractorMediaSource(uri, dsf, ef, null, null, null);
 				}
 
-				if (this.loop) {
+				/* if (this.loop) {
 					vs = new com.google.android.exoplayer2.source.LoopingMediaSource(vs);
-				}
+				} */
 
 
 			} else {

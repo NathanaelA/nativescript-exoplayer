@@ -29,6 +29,10 @@ export class HelloWorldModel extends Observable {
     this.completed = true;
   }
 
+  public playbackStart(args) {
+  	this.completed = false;
+  }
+
   /**
    * Pause the video
    */
