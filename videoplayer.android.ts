@@ -233,7 +233,7 @@ export class Video extends videoCommon.Video {
 					}
 					this.owner._emit(videoCommon.Video.finishedEvent);
 					if (this.owner.loop) {
-						this.play();
+						this.owner.play();
 					}
 				}
 
