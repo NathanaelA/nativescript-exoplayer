@@ -23,13 +23,20 @@
             ]
         }
     },
+    "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules"
+        ],
     "files": [
         "videoplayer-common.ts",
         "videoplayer.ios.ts",
         "videoplayer.android.ts",
         "video-source/video-source-common.ts",
         "video-source/video-source.ios.ts",
-        "video-source/video-source.android.ts"
+        "video-source/video-source.android.ts",
+        "subtitle-source/subtitle-source-common.ts",
+        "subtitle-source/subtitle-source.ios.ts",
+        "subtitle-source/subtitle-source.android.ts"
     ],
     "exclude": [
         "node_modules",

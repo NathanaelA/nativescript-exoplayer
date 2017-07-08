@@ -2,6 +2,7 @@
 import application = require('application');
 import { ios } from "application"
 import { videoSourceProperty } from "./videoplayer-common";
+import { subtitleSourceProperty } from "./videoplayer-common";
 
 //FIXME remove this and read fs in external file
 import fs = require("file-system");
@@ -42,6 +43,8 @@ export class Video extends videoCommon.Video {
 
         // subtitles setup
         this._subtitling = new ASBPlayerSubtitling();
+
+        this._setupSubtitleLabel();
     }
 
     get ios(): any {
@@ -50,6 +53,10 @@ export class Video extends videoCommon.Video {
 
     [videoSourceProperty.setNative](value: AVPlayerItem) {
         this._setNativeVideo(value ? value.ios : null);
+    }
+
+    [subtitleSourceProperty.setNative](value: NSString) {
+        this._updateSubtitles(value ? value.ios : null);
     }
 
     public _setNativeVideo(nativeVideoPlayer: any) {
@@ -88,9 +95,6 @@ export class Video extends videoCommon.Video {
     }
 
     private _init() {
-
-        var self = this;
-
         if (this.controls !== false) {
             this._playerController.showsPlaybackControls = true;
         }
@@ -105,16 +109,19 @@ export class Video extends videoCommon.Video {
             this._player.muted = true;
         }
 
-
         if (!this._didPlayToEndTimeActive) {
             this._didPlayToEndTimeObserver = ios.addNotificationObserver(AVPlayerItemDidPlayToEndTimeNotification, this.AVPlayerItemDidPlayToEndTimeNotification.bind(this));
             this._didPlayToEndTimeActive = true;
         }
 
-        console.log("Init subtitle label ")
-        // subtitle label
+        // it's important to set subtitle label first and then player - to let label pick up styles
+        this._subtitling.label = this._subtitleLabel
+        this._subtitling.player = this._player
+    }
+
+    private _setupSubtitleLabel(){
+        let contentOverlayView = this._playerController.contentOverlayView
         this._subtitleLabel = new UILabel()
-        let contentOverlayView = self._playerController.contentOverlayView
 
         contentOverlayView.addSubview(this._subtitleLabel)
         this._subtitleLabel.textColor = UIColor.whiteColor
@@ -128,31 +135,14 @@ export class Video extends videoCommon.Video {
         var viewsDictionary = NSDictionary.dictionaryWithObjectForKey(this._subtitleLabel, "subtitleLabel");
         contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("H:|-(20)-[subtitleLabel]-(20)-|", 0, null, viewsDictionary));
         contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:[subtitleLabel]-(30)-|", 0, null, viewsDictionary));
+    }
 
-
-        console.log("Subtitle url string param: "+this.subtitles)
-        var fileName = this.subtitles
-
-        if (fileName.indexOf("~/") === 0) {
-            fileName = fs.path.join(fs.knownFolders.currentApp().path, fileName.replace("~/", ""));
-        }
-
-        // TODO handle situation if subtitles not added
-        let url: string = NSURL.fileURLWithPath(fileName)
-        console.log("Subtitle url: "+url)
-
-        // it's important to set subtitle label first and then player - to let label pick up styles
-        this._subtitling.label = this._subtitleLabel
-        this._subtitling.player = this._player
-
+    private _updateSubtitles(subtitles: NSStirng){
         try {
-            this._subtitling.loadSubtitlesAtURLError(url)
+            this._subtitling.loadSRTContentError(subtitles)
         } catch (e) {
-            console.log("Subtitles load error: "+ e); // NSError:
+            console.log("Failed to load subtitles: "+ e); // NSError:
         }
-        console.log("Subtitles added!")
-
-
     }
 
     private AVPlayerItemDidPlayToEndTimeNotification(notification: any) {
