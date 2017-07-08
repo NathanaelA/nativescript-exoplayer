@@ -45,6 +45,7 @@ export class Video extends View {
     public android: any;
     public ios: any;
     public src: string; /// video source file
+    public subtitles: string; /// subtitles source file
     public observeCurrentTime: boolean; // set to true if want to observe current time.
     public autoplay: boolean = false; /// set true for the video to start playing when ready
     public controls: boolean = true; /// set true to enable the media player's playback controls
@@ -58,6 +59,11 @@ export const srcProperty = new Property<Video, any>({
     valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
+
+export const subtitlesProperty = new Property<Video, any>({
+    name: "subtitles"
+});
+subtitlesProperty.register(Video);
 
 export const videoSourceProperty = new Property<Video, any>({
     name: "videoSource",
