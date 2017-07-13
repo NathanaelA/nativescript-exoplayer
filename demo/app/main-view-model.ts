@@ -2,20 +2,19 @@ import { Observable } from "data/observable";
 import { Page } from "ui/page";
 import { isAndroid } from "platform";
 import { setInterval } from "timer";
-import { Video } from "nativescript-exoplayer";
 
 export class HelloWorldModel extends Observable {
   public videoSrc: string;
   public currentTime: any;
   public videoDuration: any;
-  private _videoPlayer: Video;
+  private _videoPlayer: any;
   private completed: boolean;
 
   constructor(mainpage: Page) {
     super();
 
     this.completed = false;
-    this._videoPlayer = <Video>mainpage.getViewById("nativeVideoPlayer");
+    this._videoPlayer = <any>mainpage.getViewById("nativeVideoPlayer");
     this.currentTime = "";
     this.videoDuration = "";
     this.videoSrc = "~/videos/small.mp4";
@@ -147,6 +146,9 @@ export class HelloWorldModel extends Observable {
    * Change the video src property
    */
   public changeVideoSource() {
+    //  this._videoPlayer.src = "~/videos/test_video_rotated.mp4";
+    //  return;
+
     if (this.videoSrc === "~/videos/small.mp4") {
       this._videoPlayer.src = "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
     } else {

@@ -93,14 +93,18 @@ export class Video extends videoCommon.Video {
 		}
 	}
 
-	public initNativeView(): void {
-		let that = new WeakRef(this);
-		this.nativeView = new android.widget.RelativeLayout(this._context);
-		this._textureView = new android.view.TextureView(this._context);
-		this._textureView.setFocusable(true);
-		this._textureView.setFocusableInTouchMode(true);
-		this._textureView.requestFocus();
-		this.nativeView.addView(this._textureView);
+	public createNativeView(): any {
+        this.nativeView = new android.widget.RelativeLayout(this._context);
+        this._textureView = new android.view.TextureView(this._context);
+        this._textureView.setFocusable(true);
+        this._textureView.setFocusableInTouchMode(true);
+        this._textureView.requestFocus();
+        this.nativeView.addView(this._textureView);
+        return this.nativeView;
+    }
+
+    public initNativeView(): void {
+        let that = new WeakRef(this);
 		this._setupMediaController();
 		this._textureView.setOnTouchListener(new android.view.View.OnTouchListener({
 			get owner(): Video {

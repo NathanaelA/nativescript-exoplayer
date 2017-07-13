@@ -1,6 +1,6 @@
 <Page
   xmlns="http://schemas.nativescript.org/tns.xsd"
-  xmlns:Video="./videoplayer" loaded="pageLoaded">
+  xmlns:Video="nativescript-exoplayer" loaded="pageLoaded">
   <ActionBar title="Native Video" />
   <ScrollView>
     <StackLayout>
