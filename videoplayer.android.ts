@@ -480,8 +480,10 @@ export class Video extends videoCommon.Video {
 	}
 
 	public _updateSubtitles(subtitlesSrc: any): void {
-		//FIXME implement update subtitles without reloading main video, if it will change at runtime
 		this._subtitlesSrc = subtitlesSrc
+		if (this.mediaPlayer != null) {
+			this.preSeekTime = this.mediaPlayer.getCurrentPosition()
+		}
 		this._openVideo()
 	}
 
