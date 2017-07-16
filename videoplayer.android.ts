@@ -123,9 +123,9 @@ export class Video extends videoCommon.Video {
 				get owner(): Video {
 					return that.get();
 				},
-				onSurfaceTextureSizeChanged: function (/* surface, width, height */) {
-					//console.log("SurfaceTexutureSizeChange", width, height);
-					// do nothing
+				onSurfaceTextureSizeChanged: function ( surface, width, height ) {
+					console.log("SurfaceTexutureSizeChange", width, height);
+					this.owner._setupAspectRatio();
 				},
 
 				onSurfaceTextureAvailable: function (/* surface, width, height */) {
