@@ -2,14 +2,20 @@
 import application = require('application');
 import { ios } from "application"
 import { videoSourceProperty } from "./videoplayer-common";
+import { subtitleSourceProperty } from "./videoplayer-common";
+
+//FIXME remove this and read fs in external file
+import fs = require("file-system");
 
 export * from "./videoplayer-common";
 
-declare const NSURL, AVPlayer, AVPlayerItem, NSObjectAVPlayer, AVPlayerViewController, AVPlayerItemDidPlayToEndTimeNotification, UIView, CMTimeMakeWithSeconds, NSNotification, NSNotificationCenter, CMTimeGetSeconds, CMTimeMake, kCMTimeZero, AVPlayerItemStatusReadyToPlay, AVAsset;
+declare const NSURL, AVPlayer, AVPlayerItem, ASBPlayerSubtitling,  NSObjectAVPlayer, AVPlayerViewController, AVPlayerItemDidPlayToEndTimeNotification, UIView, UILabel, UIColor, CMTimeMakeWithSeconds, NSNotification, NSNotificationCenter, NSLayoutConstraint, NSTextAlignmentCenter, CMTimeGetSeconds, CMTimeMake, kCMTimeZero, AVPlayerItemStatusReadyToPlay, AVAsset;
 
 export class Video extends videoCommon.Video {
     private _player: any; /// AVPlayer
     private _playerController: any; /// AVPlayerViewController
+    private _subtitling: any; //// ASBPlayerSubtitling
+    private _subtitleLabel: any; //// UILabel
     private _src: string;
     private _didPlayToEndTimeObserver: any;
     private _didPlayToEndTimeActive: boolean;
@@ -27,12 +33,18 @@ export class Video extends videoCommon.Video {
         this._playerController = new AVPlayerViewController();
         this._player = new AVPlayer();
         this._playerController.player = this._player;
+
         // showsPlaybackControls must be set to false on init to avoid any potential 'Unable to simultaneously satisfy constraints' errors
         this._playerController.showsPlaybackControls = false;
         this.nativeView = this._playerController.view;
         this._observer = PlayerObserverClass.alloc();
         this._observer["_owner"] = this;
         this._videoFinished = false;
+
+        // subtitles setup
+        this._subtitling = new ASBPlayerSubtitling();
+
+        this._setupSubtitleLabel();
     }
 
     get ios(): any {
@@ -43,7 +55,12 @@ export class Video extends videoCommon.Video {
         this._setNativeVideo(value ? value.ios : null);
     }
 
+    [subtitleSourceProperty.setNative](value: NSString) {
+        this._updateSubtitles(value ? value.ios : null);
+    }
+
     public _setNativeVideo(nativeVideoPlayer: any) {
+        console.log("Set native video: "+nativeVideoPlayer)
         if (nativeVideoPlayer != null) {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
@@ -73,13 +90,11 @@ export class Video extends videoCommon.Video {
         this._src = nativePlayerSrc;
         let url: string = NSURL.URLWithString(this._src);
         this._player = new AVPlayer(url);
+        console.log("Video src: "+ this._src)
         this._init();
     }
 
     private _init() {
-
-        var self = this;
-
         if (this.controls !== false) {
             this._playerController.showsPlaybackControls = true;
         }
@@ -94,12 +109,40 @@ export class Video extends videoCommon.Video {
             this._player.muted = true;
         }
 
-
         if (!this._didPlayToEndTimeActive) {
             this._didPlayToEndTimeObserver = ios.addNotificationObserver(AVPlayerItemDidPlayToEndTimeNotification, this.AVPlayerItemDidPlayToEndTimeNotification.bind(this));
             this._didPlayToEndTimeActive = true;
         }
 
+        // it's important to set subtitle label first and then player - to let label pick up styles
+        this._subtitling.label = this._subtitleLabel
+        this._subtitling.player = this._player
+    }
+
+    private _setupSubtitleLabel(){
+        let contentOverlayView = this._playerController.contentOverlayView
+        this._subtitleLabel = new UILabel()
+
+        contentOverlayView.addSubview(this._subtitleLabel)
+        this._subtitleLabel.textColor = UIColor.whiteColor
+        this._subtitleLabel.textAlignment = NSTextAlignmentCenter
+        this._subtitleLabel.lineBreakMode = NSLineBreakByWordWrapping
+        this._subtitleLabel.font = UIFont.systemFontOfSizeWeight(22, UIFontWeightRegular)
+        this._subtitleLabel.numberOfLines = 0
+
+        this._subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        var viewsDictionary = NSDictionary.dictionaryWithObjectForKey(this._subtitleLabel, "subtitleLabel");
+        contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("H:|-(20)-[subtitleLabel]-(20)-|", 0, null, viewsDictionary));
+        contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:[subtitleLabel]-(30)-|", 0, null, viewsDictionary));
+    }
+
+    private _updateSubtitles(subtitles: NSStirng){
+        try {
+            this._subtitling.loadSRTContentError(subtitles)
+        } catch (e) {
+            console.log("Failed to load subtitles: "+ e); // NSError:
+        }
     }
 
     private AVPlayerItemDidPlayToEndTimeNotification(notification: any) {
