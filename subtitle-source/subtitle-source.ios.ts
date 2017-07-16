@@ -3,12 +3,11 @@ import fs = require("file-system");
 import common = require("./subtitle-source-common");
 import definition = require("./subtitle-source");
 
-declare var android, NSString, NSBundle, NSURL;
+declare var NSString, NSBundle, NSURL;
 
 global.moduleMerge(common, exports);
 
 export class SubtitleSource implements definition.SubtitleSource {
-    public android: any; /// String
     public ios: any; /// NSString
 
     public loadFromResource(name: string): boolean {

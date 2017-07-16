@@ -21,11 +21,10 @@ function ensureFS() {
     }
 }
 
-declare var android, AVPlayer: any;
+declare var android: any;
 
-export class VideoSource implements definition.VideoSource {
+export class SubtitleSource implements definition.SubtitleSource {
     public android: any; /// String - url or resource
-    public ios: any; /// NSString - contents
 
     public loadFromResource(name: string): boolean {
         this.android = null;
