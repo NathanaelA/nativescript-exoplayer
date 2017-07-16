@@ -1,5 +1,6 @@
 ﻿import videoCommon = require("./videoplayer-common");
 import { videoSourceProperty } from "./videoplayer-common";
+import { subtitleSourceProperty } from "./videoplayer-common";
 //import videoSource = require("./video-source/video-source");
 //import timer = require("timer");
 import utils = require("utils/utils");
@@ -17,6 +18,7 @@ export class Video extends videoCommon.Video {
 	private videoWidth: number;
 	private videoHeight: number;
 	private _src: any;
+	private _subtitlesSrc: any;
 	private mediaState: number;
 	private textureSurface: any;
 	private textureSurfaceSet: boolean;
@@ -67,6 +69,10 @@ export class Video extends videoCommon.Video {
 
 	[videoSourceProperty.setNative](value) {
 		this._setNativeVideo(value ? value.android : null);
+	}
+
+	[subtitleSourceProperty.setNative](value) {
+		this._updateSubtitles(value ? value.android: null);
 	}
 
 	private _setupTextureSurface(): void {
@@ -398,6 +404,38 @@ export class Video extends videoCommon.Video {
 				vs = this._src;
 			}
 
+			// subtitles src
+			if (this._subtitlesSrc != null) {
+				let subtitleUri = android.net.Uri.parse(this._subtitlesSrc);
+
+				let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null,
+					com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP,
+					null,
+					com.google.android.exoplayer2.Format.NO_VALUE,
+					com.google.android.exoplayer2.Format.NO_VALUE,
+					"en",
+					null);
+
+				let subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(
+					subtitleUri,
+					dsf,
+					textFormat,
+					com.google.android.exoplayer2.C.TIME_UNSET );
+
+				console.log("subtitleSrc= "+subtitlesSrc)
+				console.log("vs= "+vs)
+				let newVs = vs as com.google.android.exoplayer2.source.MediaSource
+				console.log("newVS= "+vs)
+				// FIXME findout, why this is not working - crash here -
+				// Cannot convert JavaScript object with id 1035463098 at index 0 Error: Cannot convert JavaScript object with id 1035463098 at index 0
+				// If we call constructor like vararg in java - it can't find constructor
+
+				// vs = new com.google.android.exoplayer2.source.MergingMediaSource([
+				// 		subtitlesSrc as com.google.android.exoplayer2.source.MediaSource,
+				// 		newVs
+				// 	]) //constructor is vararg
+			}
+
 			if (this.mediaController) {
 				this.mediaController.setPlayer(this.mediaPlayer);
 			}
@@ -427,6 +465,11 @@ export class Video extends videoCommon.Video {
 	public setNativeSource(nativePlayerSrc: string): void {
 		this._src = nativePlayerSrc;
 		this._openVideo();
+	}
+
+	public _updateSubtitles(subtitlesSrc: any): void {
+		this._subtitlesSrc = subtitlesSrc
+		this._openVideo()
 	}
 
 	public play(): void {
