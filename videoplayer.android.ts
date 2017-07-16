@@ -15,6 +15,7 @@ const SURFACE_READY: number = 1;
 
 export class Video extends videoCommon.Video {
 	private _textureView: any; /// android.widget.VideoView
+	private _subtitlesView: any; /// com.google.android.exoplayer2.ui.SubtitleView
 	private videoWidth: number;
 	private videoHeight: number;
 	private _src: any;
@@ -106,6 +107,13 @@ export class Video extends videoCommon.Video {
         this._textureView.setFocusableInTouchMode(true);
         this._textureView.requestFocus();
         this.nativeView.addView(this._textureView);
+
+        this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context)
+		this._subtitlesView.setUserDefaultStyle()
+		this._subtitlesView.setUserDefaultTextSize()
+        this.nativeView.addView(this._subtitlesView);
+
+
         return this.nativeView;
     }
 
@@ -349,6 +357,10 @@ export class Video extends videoCommon.Video {
 				this._setupTextureSurface();
 			}
 
+			//subtitles view
+			this.mediaPlayer.setTextOutput(this._subtitlesView)
+
+
 			let dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
 			let ef = new com.google.android.exoplayer2.extractor.DefaultExtractorsFactory();
 
@@ -408,7 +420,8 @@ export class Video extends videoCommon.Video {
 			if (this._subtitlesSrc != null) {
 				let subtitleUri = android.net.Uri.parse(this._subtitlesSrc);
 
-				let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(null,
+				let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(
+					null,
 					com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP,
 					null,
 					com.google.android.exoplayer2.Format.NO_VALUE,
@@ -422,19 +435,13 @@ export class Video extends videoCommon.Video {
 					textFormat,
 					com.google.android.exoplayer2.C.TIME_UNSET );
 
-				console.log("subtitleSrc= "+subtitlesSrc)
-				console.log("vs= "+vs)
-				let newVs = vs as com.google.android.exoplayer2.source.MediaSource
-				console.log("newVS= "+vs)
-				// FIXME findout, why this is not working - crash here -
-				// Cannot convert JavaScript object with id 1035463098 at index 0 Error: Cannot convert JavaScript object with id 1035463098 at index 0
-				// If we call constructor like vararg in java - it can't find constructor
+				let mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2)
+				mergedArray[0] = vs
+				mergedArray[1] = subtitlesSrc
 
-				// vs = new com.google.android.exoplayer2.source.MergingMediaSource([
-				// 		subtitlesSrc as com.google.android.exoplayer2.source.MediaSource,
-				// 		newVs
-				// 	]) //constructor is vararg
+				vs = new com.google.android.exoplayer2.source.MergingMediaSource(mergedArray) //constructor is vararg
 			}
+
 
 			if (this.mediaController) {
 				this.mediaController.setPlayer(this.mediaPlayer);
@@ -468,6 +475,7 @@ export class Video extends videoCommon.Video {
 	}
 
 	public _updateSubtitles(subtitlesSrc: any): void {
+		//FIXME implement update subtitles without reloading main video, if it will change at runtime
 		this._subtitlesSrc = subtitlesSrc
 		this._openVideo()
 	}
