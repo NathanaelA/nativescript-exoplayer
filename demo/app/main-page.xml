@@ -12,9 +12,14 @@
         <Label col="3" text="{{ videoDuration }}" class="message" textWrap="true" />
       </GridLayout>
       <GridLayout rows="*" columns="*, *" backgroundColor="#000000">
-        <Video:Video id="nativeVideoPlayer" controls="true" loadingComplete="{{ videoCompleted }}" playbackStart="{{ playbackStart }}" finished="{{ videoFinished }}" loop="false" autoplay="true" height="280" src="{{ videoSrc }}" row="0" colSpan="2"/>
+        <Video:Video id="nativeVideoPlayer" controls="true" loadingComplete="{{ videoCompleted }}" playbackStart="{{ playbackStart }}" finished="{{ videoFinished }}" loop="false" autoplay="true" height="280" src="{{ videoSrc }}" subtitles="{{ subtitlesSrc }}" row="0" colSpan="2"/>
         <Label text="Label On Top of Video View" row="0" colSpan="2" color="#fff" horizontalAlignment="center"/>
       </GridLayout>
+      <StackLayout orientation="horizontal">
+        <Button text="Subtitles en" width="33%" tap="{{ setEnglishSubtitles }}" />
+        <Button text="Subtitles ru" width="33%" tap="{{ setRussianSubtitles }}" />
+        <Button text="Subtitles off" width="33%" tap="{{ disableSubtitles }}" />
+      </StackLayout>
       <StackLayout orientation="horizontal">
         <Button text="Pause" width="33%" tap="{{ pauseVideo }}" />
         <Button text="Play" width="33%" tap="{{ playVideo }}" />
