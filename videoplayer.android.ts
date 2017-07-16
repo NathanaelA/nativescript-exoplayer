@@ -417,29 +417,34 @@ export class Video extends videoCommon.Video {
 			}
 
 			// subtitles src
-			if (this._subtitlesSrc != null) {
-				let subtitleUri = android.net.Uri.parse(this._subtitlesSrc);
 
-				let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(
-					null,
-					com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP,
-					null,
-					com.google.android.exoplayer2.Format.NO_VALUE,
-					com.google.android.exoplayer2.Format.NO_VALUE,
-					"en",
-					null);
+			try {
+				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != "") {
+					let subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
 
-				let subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(
-					subtitleUri,
-					dsf,
-					textFormat,
-					com.google.android.exoplayer2.C.TIME_UNSET );
+					let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(
+						null,
+						com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP,
+						null,
+						com.google.android.exoplayer2.Format.NO_VALUE,
+						com.google.android.exoplayer2.Format.NO_VALUE,
+						"en",
+						null);
 
-				let mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2)
-				mergedArray[0] = vs
-				mergedArray[1] = subtitlesSrc
+					let subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(
+						subtitleUri,
+						dsf,
+						textFormat,
+						com.google.android.exoplayer2.C.TIME_UNSET );
 
-				vs = new com.google.android.exoplayer2.source.MergingMediaSource(mergedArray) //constructor is vararg
+					let mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2)
+					mergedArray[0] = vs
+					mergedArray[1] = subtitlesSrc
+
+					vs = new com.google.android.exoplayer2.source.MergingMediaSource(mergedArray) //constructor is vararg
+				}
+			} catch (ex) {
+				console.log("Error loading subtitles:", ex, ex.stack);
 			}
 
 
