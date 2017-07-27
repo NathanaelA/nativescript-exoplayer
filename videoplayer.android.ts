@@ -1,5 +1,6 @@
 ﻿import videoCommon = require("./videoplayer-common");
 import { videoSourceProperty } from "./videoplayer-common";
+import { subtitleSourceProperty } from "./videoplayer-common";
 //import videoSource = require("./video-source/video-source");
 //import timer = require("timer");
 import utils = require("utils/utils");
@@ -14,9 +15,11 @@ const SURFACE_READY: number = 1;
 
 export class Video extends videoCommon.Video {
 	private _textureView: any; /// android.widget.VideoView
+	private _subtitlesView: any; /// com.google.android.exoplayer2.ui.SubtitleView
 	private videoWidth: number;
 	private videoHeight: number;
 	private _src: any;
+	private _subtitlesSrc: any;
 	private mediaState: number;
 	private textureSurface: any;
 	private textureSurfaceSet: boolean;
@@ -69,6 +72,10 @@ export class Video extends videoCommon.Video {
 		this._setNativeVideo(value ? value.android : null);
 	}
 
+	[subtitleSourceProperty.setNative](value) {
+		this._updateSubtitles(value ? value.android: null);
+	}
+
 	private _setupTextureSurface(): void {
 		if (!this.textureSurface) {
 			if (!this._textureView.isAvailable()) {
@@ -100,6 +107,13 @@ export class Video extends videoCommon.Video {
         this._textureView.setFocusableInTouchMode(true);
         this._textureView.requestFocus();
         this.nativeView.addView(this._textureView);
+
+        this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context)
+		this._subtitlesView.setUserDefaultStyle()
+		this._subtitlesView.setUserDefaultTextSize()
+        this.nativeView.addView(this._subtitlesView);
+
+
         return this.nativeView;
     }
 
@@ -343,6 +357,10 @@ export class Video extends videoCommon.Video {
 				this._setupTextureSurface();
 			}
 
+			//subtitles view
+			this.mediaPlayer.setTextOutput(this._subtitlesView)
+
+
 			let dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
 			let ef = new com.google.android.exoplayer2.extractor.DefaultExtractorsFactory();
 
@@ -398,6 +416,38 @@ export class Video extends videoCommon.Video {
 				vs = this._src;
 			}
 
+			// subtitles src
+
+			try {
+				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != "") {
+					let subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
+
+					let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(
+						null,
+						com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP,
+						null,
+						com.google.android.exoplayer2.Format.NO_VALUE,
+						com.google.android.exoplayer2.Format.NO_VALUE,
+						"en",
+						null);
+
+					let subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(
+						subtitleUri,
+						dsf,
+						textFormat,
+						com.google.android.exoplayer2.C.TIME_UNSET );
+
+					let mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2)
+					mergedArray[0] = vs
+					mergedArray[1] = subtitlesSrc
+
+					vs = new com.google.android.exoplayer2.source.MergingMediaSource(mergedArray) //constructor is vararg
+				}
+			} catch (ex) {
+				console.log("Error loading subtitles:", ex, ex.stack);
+			}
+
+
 			if (this.mediaController) {
 				this.mediaController.setPlayer(this.mediaPlayer);
 			}
@@ -427,6 +477,14 @@ export class Video extends videoCommon.Video {
 	public setNativeSource(nativePlayerSrc: string): void {
 		this._src = nativePlayerSrc;
 		this._openVideo();
+	}
+
+	public _updateSubtitles(subtitlesSrc: any): void {
+		this._subtitlesSrc = subtitlesSrc
+		if (this.mediaPlayer != null) {
+			this.preSeekTime = this.mediaPlayer.getCurrentPosition()
+		}
+		this._openVideo()
 	}
 
 	public play(): void {

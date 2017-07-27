@@ -1,4 +1,5 @@
 ﻿import videoSource = require("./video-source/video-source");
+import subtitleSource = require("./subtitle-source/subtitle-source");
 import * as definitions from "./index";
 import { isFileOrResourcePath } from "utils/utils"
 import { isString } from "utils/types"
@@ -33,6 +34,19 @@ function onSrcPropertyChanged(view, oldValue, newValue) {
     }
 }
 
+function onSubtitlesPropertyChanged(view, oldValue, newValue) {
+    const video = view;
+    if (isString(newValue)) {
+        let value = newValue.trim()
+        video.subtitleSource = null
+        if (isFileOrResourcePath(value)){
+            video.subtitleSource = subtitleSource.fromFileOrResource(value);
+        } else {
+            video.subtitleSource = subtitleSource.fromUrl(value);
+        }
+    }
+}
+
 
 export class Video extends View {
     public static finishedEvent: string = "finished";
@@ -45,6 +59,8 @@ export class Video extends View {
     public android: any;
     public ios: any;
     public src: string; /// video source file
+    public subtitles: string; /// subtitles source file
+    public subtitleSource: string; /// subtitle source content
     public observeCurrentTime: boolean; // set to true if want to observe current time.
     public autoplay: boolean = false; /// set true for the video to start playing when ready
     public controls: boolean = true; /// set true to enable the media player's playback controls
@@ -58,6 +74,17 @@ export const srcProperty = new Property<Video, any>({
     valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
+
+export const subtitlesProperty = new Property<Video, any>({
+    name: "subtitles",
+    valueChanged: onSubtitlesPropertyChanged
+});
+subtitlesProperty.register(Video);
+
+export const subtitleSourceProperty = new Property<Video, any>({
+    name: "subtitleSource",
+});
+subtitleSourceProperty.register(Video);
 
 export const videoSourceProperty = new Property<Video, any>({
     name: "videoSource",

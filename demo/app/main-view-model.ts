@@ -5,6 +5,7 @@ import { setInterval } from "timer";
 
 export class HelloWorldModel extends Observable {
   public videoSrc: string;
+  public subtitlesSrc: string;
   public currentTime: any;
   public videoDuration: any;
   private _videoPlayer: any;
@@ -17,8 +18,21 @@ export class HelloWorldModel extends Observable {
     this._videoPlayer = <any>mainpage.getViewById("nativeVideoPlayer");
     this.currentTime = "";
     this.videoDuration = "";
-    this.videoSrc = "~/videos/small.mp4";
+    this.videoSrc = "~/videos/big_buck_bunny.mp4";
+    this.subtitlesSrc = "~/videos/sample.srt";
     this.trackVideoCurrentPosition();
+  }
+
+  public setEnglishSubtitles() {
+    this._videoPlayer.subtitles = "~/videos/sample.srt";
+  }
+
+  public setRussianSubtitles() {
+    this._videoPlayer.subtitles = "~/videos/sample-ru.srt";
+  }
+
+  public disableSubtitles() {
+    this._videoPlayer.subtitles = "";
   }
 
   /**
