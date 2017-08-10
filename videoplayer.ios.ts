@@ -1,5 +1,4 @@
 ﻿import videoCommon = require("./videoplayer-common");
-import application = require('application');
 import { ios } from "application"
 import { videoSourceProperty } from "./videoplayer-common";
 import { subtitleSourceProperty } from "./videoplayer-common";
@@ -58,7 +57,7 @@ export class Video extends videoCommon.Video {
     }
 
     public _setNativeVideo(nativeVideoPlayer: any) {
-        console.log("Set native video: "+nativeVideoPlayer)
+        console.log("Set native video: "+nativeVideoPlayer);
         if (nativeVideoPlayer != null) {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
@@ -80,7 +79,7 @@ export class Video extends videoCommon.Video {
     }
 
     public updateAsset(nativeVideoAsset: AVAsset) {
-        let newPlayerItem = AVPlayerItem.playerItemWithAsset(nativeVideoAsset)
+        let newPlayerItem = AVPlayerItem.playerItemWithAsset(nativeVideoAsset);
         this._setNativeVideo(newPlayerItem);
     }
 
@@ -88,7 +87,7 @@ export class Video extends videoCommon.Video {
         this._src = nativePlayerSrc;
         let url: string = NSURL.URLWithString(this._src);
         this._player = new AVPlayer(url);
-        console.log("Video src: "+ this._src)
+        console.log("Video src: "+ this._src);
         this._init();
     }
 
@@ -113,40 +112,40 @@ export class Video extends videoCommon.Video {
         }
 
         // it's important to set subtitle label first and then player - to let label pick up styles
-        this._subtitling.label = this._subtitleLabel
-        this._subtitling.containerView = this._subtitleLabelContainer
-        this._subtitling.player = this._player
+        this._subtitling.label = this._subtitleLabel;
+        this._subtitling.containerView = this._subtitleLabelContainer;
+        this._subtitling.player = this._player;
     }
 
     private _setupSubtitleLabel(){
-        let contentOverlayView = this._playerController.contentOverlayView
-        this._subtitleLabel = new UILabel()
-        this._subtitleLabelContainer = new UIView()
+        let contentOverlayView = this._playerController.contentOverlayView;
+        this._subtitleLabel = new UILabel();
+        this._subtitleLabelContainer = new UIView();
 
-        contentOverlayView.addSubview(this._subtitleLabelContainer)
-        this._subtitleLabelContainer.addSubview(this._subtitleLabel)
+        contentOverlayView.addSubview(this._subtitleLabelContainer);
+        this._subtitleLabelContainer.addSubview(this._subtitleLabel);
 
         //configure subtitle container - this is required to make insets
-        this._subtitleLabelContainer.backgroundColor = UIColor.blackColor
-        this._subtitleLabelContainer.layer.cornerRadius = 2
-        this._subtitleLabelContainer.layer.masksToBounds = true
+        this._subtitleLabelContainer.backgroundColor = UIColor.blackColor;
+        this._subtitleLabelContainer.layer.cornerRadius = 2;
+        this._subtitleLabelContainer.layer.masksToBounds = true;
 
         // attach subtitle label to all corners of container
-        this._subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        this._subtitleLabelContainer.translatesAutoresizingMaskIntoConstraints = false
+        this._subtitleLabel.translatesAutoresizingMaskIntoConstraints = false;
+        this._subtitleLabelContainer.translatesAutoresizingMaskIntoConstraints = false;
         let containerViewsDictionary = new NSDictionary([this._subtitleLabel], ['subtitleLabel']);
 
         this._subtitleLabelContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("H:|-(5)-[subtitleLabel]-(5)-|", NSLayoutFormatDirectionLeadingToTrailing , null, containerViewsDictionary));
         this._subtitleLabelContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:|-(0)-[subtitleLabel]-(0)-|", NSLayoutFormatDirectionLeadingToTrailing , null, containerViewsDictionary));
 
 
-        this._subtitleLabel.textColor = UIColor.whiteColor
-        this._subtitleLabel.textAlignment = NSTextAlignmentCenter
-        this._subtitleLabel.lineBreakMode = NSLineBreakByWordWrapping
-        this._subtitleLabel.font = UIFont.systemFontOfSizeWeight(15, UIFontWeightRegular)
-        this._subtitleLabel.numberOfLines = 0
+        this._subtitleLabel.textColor = UIColor.whiteColor;
+        this._subtitleLabel.textAlignment = NSTextAlignmentCenter;
+        this._subtitleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+        this._subtitleLabel.font = UIFont.systemFontOfSizeWeight(15, UIFontWeightRegular);
+        this._subtitleLabel.numberOfLines = 0;
 
-        this._subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        this._subtitleLabel.translatesAutoresizingMaskIntoConstraints = false;
 
         let viewsDictionary = new NSDictionary([this._subtitleLabelContainer, contentOverlayView], ['subtitleLabelContainer', 'superview']);
         // make 20 point insets from sides

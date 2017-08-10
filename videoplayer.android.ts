@@ -32,6 +32,7 @@ export class Video extends videoCommon.Video {
 	private eventPlaybackStart: boolean;
 	private lastTimerUpdate: number;
 	private interval: number;
+	private _suspendLocation: number;
 	public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 	public nativeView: any;
 
@@ -42,6 +43,7 @@ export class Video extends videoCommon.Video {
 		this.videoWidth = 0;
 		this.videoHeight = 0;
 		this._onReadyEmitEvent = [];
+		this._suspendLocation = null;
 
 		this._src = null;
 
@@ -108,9 +110,9 @@ export class Video extends videoCommon.Video {
         this._textureView.requestFocus();
         this.nativeView.addView(this._textureView);
 
-        this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context)
-		this._subtitlesView.setUserDefaultStyle()
-		this._subtitlesView.setUserDefaultTextSize()
+        this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context);
+		this._subtitlesView.setUserDefaultStyle();
+		this._subtitlesView.setUserDefaultTextSize();
         this.nativeView.addView(this._subtitlesView);
 
 
@@ -358,7 +360,7 @@ export class Video extends videoCommon.Video {
 			}
 
 			//subtitles view
-			this.mediaPlayer.setTextOutput(this._subtitlesView)
+			this.mediaPlayer.setTextOutput(this._subtitlesView);
 
 
 			let dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
@@ -437,9 +439,9 @@ export class Video extends videoCommon.Video {
 						textFormat,
 						com.google.android.exoplayer2.C.TIME_UNSET );
 
-					let mergedArray = Array.create(com.google.android.exoplayer2.source.MediaSource, 2)
-					mergedArray[0] = vs
-					mergedArray[1] = subtitlesSrc
+					let mergedArray = (<any>Array).create(com.google.android.exoplayer2.source.MediaSource, 2);
+					mergedArray[0] = vs;
+					mergedArray[1] = subtitlesSrc;
 
 					vs = new com.google.android.exoplayer2.source.MergingMediaSource(mergedArray) //constructor is vararg
 				}
@@ -471,18 +473,20 @@ export class Video extends videoCommon.Video {
 
 	public _setNativeVideo(nativeVideo: any): void {
 		this._src = nativeVideo;
+		this._suspendLocation = 0;
 		this._openVideo();
 	}
 
 	public setNativeSource(nativePlayerSrc: string): void {
 		this._src = nativePlayerSrc;
+        this._suspendLocation = 0;
 		this._openVideo();
 	}
 
 	public _updateSubtitles(subtitlesSrc: any): void {
-		this._subtitlesSrc = subtitlesSrc
+		this._subtitlesSrc = subtitlesSrc;
 		if (this.mediaPlayer != null) {
-			this.preSeekTime = this.mediaPlayer.getCurrentPosition()
+			this.preSeekTime = this.mediaPlayer.getCurrentPosition();
 		}
 		this._openVideo()
 	}
@@ -600,10 +604,15 @@ export class Video extends videoCommon.Video {
 	}
 
 	public suspendEvent(): void {
+	    this._suspendLocation = this.getCurrentTime();
 		this.release();
 	}
 
 	public resumeEvent(): void {
+	    if (this._suspendLocation) {
+	        this.seekToTime(this._suspendLocation);
+	        this._suspendLocation = 0;
+        }
 		this._openVideo();
 	}
 

@@ -2,6 +2,7 @@
 screens/
 app/
 .vscode/
+.idea/
 *.png
 *.log
 *.ts
@@ -11,6 +12,8 @@ app/
 tsconfig.json
 README.md
 *.tgz
+*.zip
+*.tar
 .npmignore
 .idea
 *.map
