@@ -5,7 +5,7 @@ import { subtitleSourceProperty } from "./videoplayer-common";
 
 export * from "./videoplayer-common";
 
-declare const NSURL, NSDictionary, AVPlayer, AVPlayerItem, ASBPlayerSubtitling,  NSObjectAVPlayer, AVPlayerViewController, AVPlayerItemDidPlayToEndTimeNotification, UIView, UILabel, UIColor, CMTimeMakeWithSeconds, NSNotification, NSNotificationCenter, NSLayoutConstraint, NSLayoutFormatOptions, NSTextAlignmentCenter, CMTimeGetSeconds, CMTimeMake, kCMTimeZero, AVPlayerItemStatusReadyToPlay, AVAsset;
+declare const NSURL, NSDictionary, AVPlayer, AVPlayerItem, ASBPlayerSubtitling, AVAudioSession, AVAudioSessionCategoryPlayAndRecord, AVAudioSessionPortOverrideSpeaker, NSObjectAVPlayer, AVPlayerViewController, AVPlayerItemDidPlayToEndTimeNotification, UIView, UILabel, UIColor, CMTimeMakeWithSeconds, NSNotification, NSNotificationCenter, NSLayoutConstraint, NSLayoutFormatOptions, NSTextAlignmentCenter, CMTimeGetSeconds, CMTimeMake, kCMTimeZero, AVPlayerItemStatusReadyToPlay, AVAsset;
 
 export class Video extends videoCommon.Video {
     private _player: any; /// AVPlayer
@@ -28,6 +28,17 @@ export class Video extends videoCommon.Video {
     constructor() {
         super();
         this._playerController = new AVPlayerViewController();
+        
+        let audioSession = AVAudioSession.sharedInstance();
+        try {
+          audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
+          audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverrideSpeaker);
+          audioSession.setActiveError(true);
+          //console.log("audioSession category set and active");
+        } catch (err) {
+          //console.log("setting audioSession category failed");
+        }
+        
         this._player = new AVPlayer();
         this._playerController.player = this._player;
 
