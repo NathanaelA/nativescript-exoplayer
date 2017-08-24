@@ -30,13 +30,16 @@ export class Video extends videoCommon.Video {
         this._playerController = new AVPlayerViewController();
         
         let audioSession = AVAudioSession.sharedInstance();
-        try {
-          audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
-          audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverrideSpeaker);
-          audioSession.setActiveError(true);
-          //console.log("audioSession category set and active");
-        } catch (err) {
-          //console.log("setting audioSession category failed");
+        let output = audioSession.currentRoute.outputs.lastObject.portType;
+        if (output.match(/Receiver/)) {
+            try {
+              audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
+              audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverrideSpeaker);
+              audioSession.setActiveError(true);
+              //console.log("audioSession category set and active");
+            } catch (err) {
+              //console.log("setting audioSession category failed");
+            }
         }
         
         this._player = new AVPlayer();
