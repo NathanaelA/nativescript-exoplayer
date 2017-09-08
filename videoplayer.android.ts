@@ -75,7 +75,7 @@ export class Video extends videoCommon.Video {
 	}
 
 	[subtitleSourceProperty.setNative](value) {
-		this._updateSubtitles(value ? value.android: null);
+		this._updateSubtitles(value ? value.android : null);
 	}
 
 	private _setupTextureSurface(): void {
@@ -103,24 +103,25 @@ export class Video extends videoCommon.Video {
 	}
 
 	public createNativeView(): any {
-        this.nativeView = new android.widget.RelativeLayout(this._context);
-        this._textureView = new android.view.TextureView(this._context);
-        this._textureView.setFocusable(true);
-        this._textureView.setFocusableInTouchMode(true);
-        this._textureView.requestFocus();
-        this.nativeView.addView(this._textureView);
+		const nativeView = new android.widget.RelativeLayout(this._context);
+		this._textureView = new android.view.TextureView(this._context);
+		this._textureView.setFocusable(true);
+		this._textureView.setFocusableInTouchMode(true);
+		this._textureView.requestFocus();
+		nativeView.addView(this._textureView);
 
-        this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context);
+		this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context);
 		this._subtitlesView.setUserDefaultStyle();
 		this._subtitlesView.setUserDefaultTextSize();
-        this.nativeView.addView(this._subtitlesView);
+		nativeView.addView(this._subtitlesView);
 
 
-        return this.nativeView;
-    }
+		return nativeView;
+	}
 
-    public initNativeView(): void {
-        let that = new WeakRef(this);
+	public initNativeView(): void {
+		super.initNativeView();
+		let that = new WeakRef(this);
 		this._setupMediaController();
 		this._textureView.setOnTouchListener(new android.view.View.OnTouchListener({
 			get owner(): Video {
@@ -139,7 +140,7 @@ export class Video extends videoCommon.Video {
 				get owner(): Video {
 					return that.get();
 				},
-				onSurfaceTextureSizeChanged: function ( surface, width, height ) {
+				onSurfaceTextureSizeChanged: function (surface, width, height) {
 					console.log("SurfaceTexutureSizeChange", width, height);
 					this.owner._setupAspectRatio();
 				},
@@ -437,7 +438,7 @@ export class Video extends videoCommon.Video {
 						subtitleUri,
 						dsf,
 						textFormat,
-						com.google.android.exoplayer2.C.TIME_UNSET );
+						com.google.android.exoplayer2.C.TIME_UNSET);
 
 					let mergedArray = (<any>Array).create(com.google.android.exoplayer2.source.MediaSource, 2);
 					mergedArray[0] = vs;
@@ -479,7 +480,7 @@ export class Video extends videoCommon.Video {
 
 	public setNativeSource(nativePlayerSrc: string): void {
 		this._src = nativePlayerSrc;
-        this._suspendLocation = 0;
+		this._suspendLocation = 0;
 		this._openVideo();
 	}
 
@@ -604,15 +605,15 @@ export class Video extends videoCommon.Video {
 	}
 
 	public suspendEvent(): void {
-	    this._suspendLocation = this.getCurrentTime();
+		this._suspendLocation = this.getCurrentTime();
 		this.release();
 	}
 
 	public resumeEvent(): void {
-	    if (this._suspendLocation) {
-	        this.seekToTime(this._suspendLocation);
-	        this._suspendLocation = 0;
-        }
+		if (this._suspendLocation) {
+			this.seekToTime(this._suspendLocation);
+			this._suspendLocation = 0;
+		}
 		this._openVideo();
 	}
 
