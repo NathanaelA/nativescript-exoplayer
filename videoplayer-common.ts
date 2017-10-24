@@ -67,6 +67,8 @@ export class Video extends View {
     public loop: boolean = false; /// whether the video loops the playback after extends
     public muted: boolean = false;
     public fill: boolean = false;
+
+    public enableSubtitles: boolean;
 }
 
 export const srcProperty = new Property<Video, any>({
