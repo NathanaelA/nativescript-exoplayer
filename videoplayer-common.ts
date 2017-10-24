@@ -77,6 +77,12 @@ export const srcProperty = new Property<Video, any>({
 });
 srcProperty.register(Video);
 
+export const enableSubtitlesProperty = new Property<Video, boolean>({
+    name: "enableSubtitles",
+    valueConverter: booleanConverter,
+});
+enableSubtitlesProperty.register(Video);
+
 export const subtitlesProperty = new Property<Video, any>({
     name: "subtitles",
     valueChanged: onSubtitlesPropertyChanged
