@@ -53,9 +53,11 @@ export class Video extends videoCommon.Video {
         this._videoFinished = false;
 
         // subtitles setup
-        this._subtitling = new ASBPlayerSubtitling();
-
-        this._setupSubtitleLabel();
+        if (this.enableSubtitles) {
+            this._subtitling = new ASBPlayerSubtitling();
+    
+            this._setupSubtitleLabel();
+        }
     }
 
     get ios(): any {
@@ -125,10 +127,12 @@ export class Video extends videoCommon.Video {
             this._didPlayToEndTimeActive = true;
         }
 
-        // it's important to set subtitle label first and then player - to let label pick up styles
-        this._subtitling.label = this._subtitleLabel;
-        this._subtitling.containerView = this._subtitleLabelContainer;
-        this._subtitling.player = this._player;
+        if (this.enableSubtitles) {
+            // it's important to set subtitle label first and then player - to let label pick up styles
+            this._subtitling.label = this._subtitleLabel;
+            this._subtitling.containerView = this._subtitleLabelContainer;
+            this._subtitling.player = this._player;
+        }    
     }
 
     private _setupSubtitleLabel(){
@@ -170,12 +174,14 @@ export class Video extends videoCommon.Video {
         contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:[subtitleLabelContainer]-(20)-|", 0, null, viewsDictionary));
     }
 
-    private _updateSubtitles(subtitles: NSStirng){
-        try {
-            this._subtitling.loadSRTContentError(subtitles)
-        } catch (e) {
-            console.log("Failed to load subtitles: "+ e); // NSError:
-        }
+    private _updateSubtitles(subtitles: NSString) {
+        if (this.enableSubtitles) {
+            try {
+                this._subtitling.loadSRTContentError(subtitles)
+            } catch (e) {
+                console.log("Failed to load subtitles: " + e); // NSError:
+            }
+        }    
     }
 
     private AVPlayerItemDidPlayToEndTimeNotification(notification: any) {

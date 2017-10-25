@@ -71,9 +71,14 @@ registerElement("exoplayer", () => require("nativescript-exoplayer").Video);
 
 Set the video file to play, for best performance use local video files if possible. The file must adhere to the platforms accepted video formats. For reference check the platform specs on playing videos.
 
+- **enableSubtitles**
+
+By default, subtitle support is off. Use this flag to turn them on.
+
 - **subtitles**
 
 Set `.srt` file with subtitles for given video. This can be local file or internet url. Currently only `.srt` format is supported.
+
 
 - **autoplay - (boolean)** - *optional*
 

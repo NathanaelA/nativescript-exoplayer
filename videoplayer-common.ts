@@ -67,6 +67,8 @@ export class Video extends View {
     public loop: boolean = false; /// whether the video loops the playback after extends
     public muted: boolean = false;
     public fill: boolean = false;
+
+    public enableSubtitles: boolean;
 }
 
 export const srcProperty = new Property<Video, any>({
@@ -74,6 +76,12 @@ export const srcProperty = new Property<Video, any>({
     valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
+
+export const enableSubtitlesProperty = new Property<Video, boolean>({
+    name: "enableSubtitles",
+    valueConverter: booleanConverter,
+});
+enableSubtitlesProperty.register(Video);
 
 export const subtitlesProperty = new Property<Video, any>({
     name: "subtitles",
