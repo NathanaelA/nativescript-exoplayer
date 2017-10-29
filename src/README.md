@@ -1,30 +1,35 @@
 [![npm](https://img.shields.io/npm/v/nativescript-exoplayer.svg)](https://www.npmjs.com/package/nativescript-exoplayer)
+[![npm](https://img.shields.io/npm/l/nativescript-exoplayer.svg)](https://www.npmjs.com/package/nativescript-exoplayer)
 [![npm](https://img.shields.io/npm/dt/nativescript-exoplayer.svg?label=npm%20downloads)](https://www.npmjs.com/package/nativescript-exoplayer)
+[![Twitter Follow](https://img.shields.io/twitter/follow/congocart.svg?style=social&label=Follow%20me)](https://twitter.com/congocart)
 
 # NativeScript ExoPlayer 
-A NativeScript plugin to provide the ability to play local and remote videos.
+A NativeScript plugin to provide the ability to play local and remote videos using Google's ExoPlayer.
 
-For a 100% NativeScript plugin use the [NativeScript-VideoPlayer](https://github.com/bradmartin/nativescript-videoplayer). 
+## Developed by
+[![MasterTech](https://plugins.nativescript.rocks/i/mtns.png)](https://plugins.nativescript.rocks/mastertech-nstudio)
 
-#### Platform controls used: 
+
+## Platform controls used: 
 Android | iOS
 ---------- | -----------
 [Google ExoPlayer](https://github.com/google/ExoPlayer) |  [iOS AVPlayer](https://developer.apple.com/library/prerelease/ios/documentation/AVFoundation/Reference/AVPlayer_Class/index.html)
+For a 100% NativeScript plugin use the [NativeScript-VideoPlayer](https://github.com/bradmartin/nativescript-videoplayer). 
 
 
 ## Based on
-This is based on the awesome [NativeScript-VideoPlayer](https://github.com/bradmartin/nativescript-videoplayer); the Android side was re-written to use Google's enhanced ExoPlayer.
+This is based on the awesome [NativeScript-VideoPlayer](https://github.com/bradmartin/nativescript-videoplayer) by Brad Martin (nStudio, llc); the Android side was re-written to use Google's enhanced ExoPlayer.  The iOS side is the same thing as what was in the original NativeScript-VideoPlayer.
 
-Since there is a lot of cases where you might still want a 100% NativeScript plugin, Brad and I decided to make this a separate plugin so that you can use the original NativeScript-VideoPlayer for those cases where you want a pure JS plugin.
+Since there is a lot of cases where you might still want a 100% NativeScript plugin, Brad and I decided to make this a separate plugin so that you can use the original NativeScript-VideoPlayer for those cases where you want a pure JavaScript plugin.
 
-The Google ExoPlayer adds about a meg and a half plugin to the application.
+The Google ExoPlayer adds about a meg and a half plugin to the Android application.
 
 
 ## Sample Usage
 
                 Sample 1             |              Sample 2
 -------------------------------------| -------------------------------------
-![Sample Usage](./screens/video.gif) | ![Sample 2](./screens/videoplayer.gif)
+![Sample Usage](../screens/video.gif) | ![Sample 2](../screens/videoplayer.gif)
 
 
 ## Installation
@@ -137,9 +142,19 @@ Attribute to specify an event callback to execute when the time is updated.
 - **stop()** - Stop the playback - this resets the player and remove the video src
 
 
+## Breaking Changes
+
+- Android will now attach/detach to the application suspend/resume and de-register/re-register video
+- Subtile support will by default be disabled.
+
+
 ### Contributors
 
+- Alex Semenov
 - Alex Ziskind [@digitalix](https://twitter.com/digitalix)
-- Nathanael Anderson [@CongoCart](https://twitter.com/CongoCart)
 - Blake Nussey
-- Brad Martin 
+- Brad Martin [@BradWayneMartin](https://twitter.com/BradWayneMartin)
+- Jibon Lawrence Costa
+- Nathanael Anderson [@CongoCart](https://twitter.com/CongoCart)
+- Nathan Walker [@wwwalkerrun](https://twitter.com/wwwalkerrun)
+- Osie Fortune 

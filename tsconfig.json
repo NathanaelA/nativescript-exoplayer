@@ -28,15 +28,15 @@
             "./node_modules"
         ],
     "files": [
-        "videoplayer-common.ts",
-        "videoplayer.ios.ts",
-        "videoplayer.android.ts",
-        "video-source/video-source-common.ts",
-        "video-source/video-source.ios.ts",
-        "video-source/video-source.android.ts",
-        "subtitle-source/subtitle-source-common.ts",
-        "subtitle-source/subtitle-source.ios.ts",
-        "subtitle-source/subtitle-source.android.ts"
+        "src/videoplayer-common.ts",
+        "src/videoplayer.ios.ts",
+        "src/videoplayer.android.ts",
+        "src/video-source/video-source-common.ts",
+        "src/video-source/video-source.ios.ts",
+        "src/video-source/video-source.android.ts",
+        "src/subtitle-source/subtitle-source-common.ts",
+        "src/subtitle-source/subtitle-source.ios.ts",
+        "src/subtitle-source/subtitle-source.android.ts"
     ],
     "exclude": [
         "node_modules",

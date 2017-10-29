@@ -4,6 +4,7 @@ import { subtitleSourceProperty } from "./videoplayer-common";
 //import videoSource = require("./video-source/video-source");
 //import timer = require("timer");
 import utils = require("utils/utils");
+const application = require('application');
 
 export * from "./videoplayer-common";
 
@@ -33,8 +34,12 @@ export class Video extends videoCommon.Video {
 	private lastTimerUpdate: number;
 	private interval: number;
 	private _suspendLocation: number;
-	public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
+    private _boundStart = this.resumeEvent.bind(this);
+    private _boundStop = this.suspendEvent.bind(this);
+
+    public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 	public nativeView: any;
+
 
 	constructor() {
 		super();
@@ -59,7 +64,7 @@ export class Video extends videoCommon.Video {
 		this.eventPlaybackStart = false;
 		this.lastTimerUpdate = -1;
 		this.interval = null;
-	}
+    }
 
 	get playState(): any {
 		if (!this.mediaPlayer) { return STATE_IDLE; }
@@ -115,7 +120,7 @@ export class Video extends videoCommon.Video {
 			this._subtitlesView.setUserDefaultStyle();
 			this._subtitlesView.setUserDefaultTextSize();
 			nativeView.addView(this._subtitlesView);
-		}	
+		}
 
 
 		return nativeView;
@@ -174,9 +179,18 @@ export class Video extends videoCommon.Video {
 				}
 			}
 		));
-	}
 
-	public toggleMediaControllerVisibility(): void {
+        application.on(application.suspendEvent, this._boundStop);
+        application.on(application.resumeEvent, this._boundStart);
+
+    }
+
+    public disposeNativeView() {
+        application.off(application.suspendEvent, this._boundStop);
+        application.off(application.resumeEvent, this._boundStart);
+    }
+
+    public toggleMediaControllerVisibility(): void {
 		if (!this.mediaController || !this.mediaPlayer) { return; }
 		if (this.mediaController.isVisible()) {
 			this.mediaController.hide();
@@ -365,7 +379,7 @@ export class Video extends videoCommon.Video {
 			if (this.enableSubtitles) {
 				//subtitles view
 				this.mediaPlayer.setTextOutput(this._subtitlesView);
-			}	
+			}
 
 
 			let dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
@@ -495,7 +509,7 @@ export class Video extends videoCommon.Video {
 				this.preSeekTime = this.mediaPlayer.getCurrentPosition();
 			}
 			this._openVideo();
-		}	
+		}
 	}
 
 	public play(): void {

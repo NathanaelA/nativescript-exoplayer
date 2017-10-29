@@ -28,7 +28,7 @@ export class Video extends videoCommon.Video {
     constructor() {
         super();
         this._playerController = new AVPlayerViewController();
-        
+
         let audioSession = AVAudioSession.sharedInstance();
         let output = audioSession.currentRoute.outputs.lastObject.portType;
         if (output.match(/Receiver/)) {
@@ -41,7 +41,7 @@ export class Video extends videoCommon.Video {
               //console.log("setting audioSession category failed");
             }
         }
-        
+
         this._player = new AVPlayer();
         this._playerController.player = this._player;
 
@@ -55,7 +55,7 @@ export class Video extends videoCommon.Video {
         // subtitles setup
         if (this.enableSubtitles) {
             this._subtitling = new ASBPlayerSubtitling();
-    
+
             this._setupSubtitleLabel();
         }
     }
@@ -73,7 +73,7 @@ export class Video extends videoCommon.Video {
     }
 
     public _setNativeVideo(nativeVideoPlayer: any) {
-        console.log("Set native video: "+nativeVideoPlayer);
+        //console.log("Set native video: "+nativeVideoPlayer);
         if (nativeVideoPlayer != null) {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
@@ -103,7 +103,7 @@ export class Video extends videoCommon.Video {
         this._src = nativePlayerSrc;
         let url: string = NSURL.URLWithString(this._src);
         this._player = new AVPlayer(url);
-        console.log("Video src: "+ this._src);
+        //console.log("Video src: "+ this._src);
         this._init();
     }
 
@@ -132,7 +132,7 @@ export class Video extends videoCommon.Video {
             this._subtitling.label = this._subtitleLabel;
             this._subtitling.containerView = this._subtitleLabelContainer;
             this._subtitling.player = this._player;
-        }    
+        }
     }
 
     private _setupSubtitleLabel(){
@@ -181,7 +181,7 @@ export class Video extends videoCommon.Video {
             } catch (e) {
                 console.log("Failed to load subtitles: " + e); // NSError:
             }
-        }    
+        }
     }
 
     private AVPlayerItemDidPlayToEndTimeNotification(notification: any) {
@@ -272,8 +272,13 @@ export class Video extends videoCommon.Video {
     }
 
     private _removeStatusObserver(currentItem) {
+        // If the observer is active, then we need to remove it...
+        if (!this._observerActive) { return; }
+
         this._observerActive = false;
-        currentItem.removeObserverForKeyPath(this._observer, "status");
+        if (currentItem) {
+            currentItem.removeObserverForKeyPath(this._observer, "status");
+        }
     }
 
     private _addPlaybackTimeObserver() {

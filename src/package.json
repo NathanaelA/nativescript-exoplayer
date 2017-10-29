@@ -66,7 +66,12 @@
       "name": "Alexander Semenov",
       "email": "asemenovboyarka@gmail.com",
       "url": "https://github.com/SemenovAlexander"
-    }
+    },
+	{
+	  "name": "Nathan Walker",
+	  "email": "walkerrunpdx@gmail.com",
+	  "url": "https://github.com/NathanWalker"
+	}
   ],
   "author": {
     "name": "Nathanael Anderson",
@@ -83,8 +88,5 @@
     "tns-core-modules": "^3.0.0",
     "tns-platform-declarations": "^3.0.0",
     "typescript": "^2.2.2"
-  },
-  "peerDependencies": {
-    "tns-core-modules": "^3.0.0"
   }
 }
