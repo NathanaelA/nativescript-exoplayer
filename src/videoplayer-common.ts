@@ -4,6 +4,7 @@ import * as definitions from "./index";
 import { isFileOrResourcePath } from "utils/utils"
 import { isString } from "utils/types"
 import { View, Property, booleanConverter } from "ui/core/view";
+import imageSource = require('image-source');
 
 // on Android we explicitly set propertySettings to None because android will invalidate its layout (skip unnecessary native call).
 // var AffectsLayout = platform.device.os === platform.platformNames.android ? dependencyObservable.PropertyMetadataSettings.None : dependencyObservable.PropertyMetadataSettings.AffectsLayout;
@@ -37,8 +38,8 @@ function onSrcPropertyChanged(view, oldValue, newValue) {
 function onSubtitlesPropertyChanged(view, oldValue, newValue) {
     const video = view;
     if (isString(newValue)) {
-        let value = newValue.trim()
-        video.subtitleSource = null
+        let value = newValue.trim();
+        video.subtitleSource = null;
         if (isFileOrResourcePath(value)){
             video.subtitleSource = subtitleSource.fromFileOrResource(value);
         } else {
@@ -47,6 +48,29 @@ function onSubtitlesPropertyChanged(view, oldValue, newValue) {
     }
 }
 
+function onImgSrcPropertyChanged(view, oldValue, newValue) {
+    const video = view;
+    let value = newValue;
+
+    if (isString(value)) {
+        value = value.trim();
+        video["_url"] = value;
+        video.isLoadingProperty = true;
+        if (isFileOrResourcePath(value)) {
+            video.imageSource = imageSource.fromFileOrResource(value);
+            video.isLoadingProperty = false;
+        } else {
+            if (video["_url"] === value) {
+                video.imageSource = imageSource.fromUrl(value);
+                video.isLoadingProperty = false;
+            }
+        }
+    } else if (value instanceof imageSource.ImageSource) {
+        video.imageSource = value;
+    } else {
+        video.imageSource = imageSource.fromNativeSource(value);
+    }
+}
 
 export class Video extends View {
     public static finishedEvent: string = "finished";
@@ -59,6 +83,8 @@ export class Video extends View {
     public android: any;
     public ios: any;
     public src: string; /// video source file
+    public imgSrc: string;
+    public imgType: number = 1;
     public subtitles: string; /// subtitles source file
     public subtitleSource: string; /// subtitle source content
     public observeCurrentTime: boolean; // set to true if want to observe current time.
@@ -68,7 +94,10 @@ export class Video extends View {
     public muted: boolean = false;
     public fill: boolean = false;
 
-    public enableSubtitles: boolean;
+    public static IMAGETYPEMONO = 1;
+    public static IMAGETYPESTEREOTOPBOTTOM = 2;
+    public static IMAGETYPESTEREOLEFTRIGHT = 3;
+
 }
 
 export const srcProperty = new Property<Video, any>({
@@ -77,11 +106,16 @@ export const srcProperty = new Property<Video, any>({
 });
 srcProperty.register(Video);
 
-export const enableSubtitlesProperty = new Property<Video, boolean>({
-    name: "enableSubtitles",
-    valueConverter: booleanConverter,
+export const imgSrcProperty = new Property<Video, any>({
+    name: "imgSrc",
+    valueChanged: onImgSrcPropertyChanged
 });
-enableSubtitlesProperty.register(Video);
+imgSrcProperty.register(Video);
+
+export const imgTypeProperty = new Property<Video, any>({
+    name: "imgType",
+});
+imgTypeProperty.register(Video);
 
 export const subtitlesProperty = new Property<Video, any>({
     name: "subtitles",
@@ -98,6 +132,12 @@ export const videoSourceProperty = new Property<Video, any>({
     name: "videoSource",
 });
 videoSourceProperty.register(Video);
+
+export const imageSourceProperty = new Property<Video, any>({
+    name: "imageSource",
+});
+imageSourceProperty.register(Video);
+
 
 export const isLoadingProperty = new Property<Video, boolean>({
     name: "isLoading",

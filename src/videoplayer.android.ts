@@ -10,7 +10,12 @@ export * from "./videoplayer-common";
 
 declare const android: any, com: any;
 
-const STATE_IDLE: number = 0;
+// States from Exo Player
+const STATE_IDLE: number = 1;
+const STATE_BUFFERING: number = 2;
+const STATE_READY: number = 3;
+const STATE_ENDED: number = 4;
+
 const SURFACE_WAITING: number = 0;
 const SURFACE_READY: number = 1;
 
@@ -36,6 +41,7 @@ export class Video extends videoCommon.Video {
 	private _suspendLocation: number;
     private _boundStart = this.resumeEvent.bind(this);
     private _boundStop = this.suspendEvent.bind(this);
+    private enableSubtitles: boolean = false;
 
     public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 	public nativeView: any;
@@ -185,7 +191,12 @@ export class Video extends videoCommon.Video {
 
     }
 
-    public disposeNativeView() {
+    public disposeNativeView()
+    {
+        this.disableEventTracking();
+    }
+
+    public disableEventTracking() {
         application.off(application.suspendEvent, this._boundStop);
         application.off(application.resumeEvent, this._boundStart);
     }
@@ -246,7 +257,7 @@ export class Video extends videoCommon.Video {
 				// 3 = Ready
 				// 4 = Ended
 
-				if (playbackState === 3) {
+				if (playbackState === STATE_READY) {
 
 					// We have to fire this from here in the event the textureSurface isn't set yet...
 					if (!this.owner.textureSurfaceSet && !this.owner.eventPlaybackReady) {
@@ -263,7 +274,7 @@ export class Video extends videoCommon.Video {
 						// this.owner._emit(videoCommon.Video.playbackStartEvent);
 					}
 				}
-				else if (playbackState === 4) {
+				else if (playbackState === STATE_ENDED) {
 					if (!this.owner.loop) {
 						this.owner.eventPlaybackStart = false;
 						this.owner.stopCurrentTimer();
@@ -513,11 +524,10 @@ export class Video extends videoCommon.Video {
 	}
 
 	public play(): void {
-		if (!this.mediaPlayer) { return; }
-		if (this.mediaState === SURFACE_WAITING) {
+		if (!this.mediaPlayer || this.mediaState === SURFACE_WAITING) {
 			this._openVideo();
 		}
-		else if (this.playState === 4) {
+		else if (this.playState === STATE_ENDED) {
 			this.eventPlaybackStart = false;
 			this.mediaPlayer.seekToDefaultPosition();
 			this.startCurrentTimer();
@@ -572,7 +582,10 @@ export class Video extends videoCommon.Video {
 
 	public isPlaying(): boolean {
 		if (!this.mediaPlayer) { return false; }
-		return this.mediaPlayer.isPlaying();
+		if (this.playState === STATE_READY) {
+		    return this.mediaPlayer.getPlayWhenReady();
+        }
+		return false;
 	}
 
 	public getDuration(): number {
