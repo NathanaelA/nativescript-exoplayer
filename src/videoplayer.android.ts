@@ -289,6 +289,9 @@ export class Video extends videoCommon.Video {
 			onPositionDiscontinuity: function () {
 				// Do nothing
 			},
+			onSeekProcessed: function () {
+				// Do nothing
+			},
 			onTimelineChanged: function (/* timeline, manifest */) {
 				// Do nothing
 			},
