@@ -1,6 +1,6 @@
 ﻿import videoSource = require("./video-source/video-source");
 import subtitleSource = require("./subtitle-source/subtitle-source");
-import * as definitions from "./index";
+import * as definitions from "./videoplayer";
 import { isFileOrResourcePath } from "utils/utils"
 import { isString } from "utils/types"
 import { View, Property, booleanConverter } from "ui/core/view";

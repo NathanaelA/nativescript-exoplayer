@@ -8,6 +8,7 @@ app/
 *.ts
 !index.d.ts
 !videoplayer.d.ts
+!subtitle-source/subtitle-source.d.ts
 !video-source/video-source.d.ts
 tsconfig.json
 README.md
@@ -18,3 +19,4 @@ README.md
 .idea
 *.map
 *.stackdump
+package*/

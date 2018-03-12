@@ -5,7 +5,30 @@ import { subtitleSourceProperty } from "./videoplayer-common";
 
 export * from "./videoplayer-common";
 
-declare const NSURL, NSDictionary, AVPlayer, AVPlayerItem, ASBPlayerSubtitling, AVAudioSession, AVAudioSessionCategoryPlayAndRecord, AVAudioSessionPortOverrideSpeaker, NSObjectAVPlayer, AVPlayerViewController, AVPlayerItemDidPlayToEndTimeNotification, UIView, UILabel, UIColor, CMTimeMakeWithSeconds, NSNotification, NSNotificationCenter, NSLayoutConstraint, NSLayoutFormatOptions, NSTextAlignmentCenter, CMTimeGetSeconds, CMTimeMake, kCMTimeZero, AVPlayerItemStatusReadyToPlay, AVAsset;
+declare const
+    NSURL,
+    NSDictionary,
+    AVPlayer,
+    AVPlayerItem,
+    ASBPlayerSubtitling,
+    AVAudioSession,
+    AVAudioSessionCategoryPlayAndRecord,
+    AVAudioSessionPortOverrideSpeaker,
+    AVPlayerViewController,
+    AVPlayerItemDidPlayToEndTimeNotification,
+    UIView,
+    UILabel,
+    UIColor,
+    CMTimeMakeWithSeconds,
+    NSLayoutConstraint,
+    NSTextAlignmentCenter,
+    CMTimeGetSeconds,
+    CMTimeMake,
+    kCMTimeZero,
+    AVPlayerItemStatusReadyToPlay,
+    NSLayoutFormatDirectionLeadingToTrailing,
+    NSLineBreakByWordWrapping,
+    NSLayoutFormatAlignAllCenterX;
 
 export class Video extends videoCommon.Video {
     private _player: any; /// AVPlayer
@@ -23,6 +46,7 @@ export class Video extends videoCommon.Video {
     private _playbackTimeObserverActive: boolean;
     private _videoPlaying: boolean;
     private _videoFinished: boolean;
+    private enableSubtitles: boolean = false;
     public nativeView: any;
 
     constructor() {
@@ -65,11 +89,11 @@ export class Video extends videoCommon.Video {
     }
 
     [videoSourceProperty.setNative](value: AVPlayerItem) {
-        this._setNativeVideo(value ? value.ios : null);
+        this._setNativeVideo(value ? (<any>value).ios : null);
     }
 
     [subtitleSourceProperty.setNative](value: NSString) {
-        this._updateSubtitles(value ? value.ios : null);
+        this._updateSubtitles(value ? (<any>value).ios : null);
     }
 
     public _setNativeVideo(nativeVideoPlayer: any) {
@@ -114,7 +138,7 @@ export class Video extends videoCommon.Video {
 
         this._playerController.player = this._player;
 
-        if (isNaN(this.width) || isNaN(this.height)) {
+        if (isNaN(<any>this.width) || isNaN(<any>this.height)) {
             this.requestLayout();
         }
 
