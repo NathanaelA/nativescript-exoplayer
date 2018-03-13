@@ -294,6 +294,9 @@ export class Video extends videoCommon.Video {
 			},
 			onTracksChanged: function (/* trackGroups, trackSelections */) {
 				// Do nothing
+			},
+			onSeekProcessed: function(){
+				// Do nothing
 			}
 		});
 		this.mediaPlayer.setVideoListener(vidListener);
