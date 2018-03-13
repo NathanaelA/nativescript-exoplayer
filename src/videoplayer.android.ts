@@ -289,6 +289,9 @@ export class Video extends videoCommon.Video {
 			onPositionDiscontinuity: function () {
 				// Do nothing
 			},
+			onSeekProcessed: function () {
+				// Do nothing
+			},
 			onTimelineChanged: function (/* timeline, manifest */) {
 				// Do nothing
 			},
@@ -658,7 +661,7 @@ export class Video extends videoCommon.Video {
 			return;
 		}
 		this.lastTimerUpdate = -1;
-		this.interval = setInterval(() => {
+		this.interval = <any>setInterval(() => {
 			this.fireCurrentTimeEvent();
 		}, 200);
 	}

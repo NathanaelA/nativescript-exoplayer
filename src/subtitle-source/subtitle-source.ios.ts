@@ -8,6 +8,7 @@ declare var NSString, NSBundle, NSURL;
 global.moduleMerge(common, exports);
 
 export class SubtitleSource implements definition.SubtitleSource {
+    public android: any; /// String - url or resource
     public ios: any; /// NSString
 
     public loadFromResource(name: string): boolean {

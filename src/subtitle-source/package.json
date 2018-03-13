@@ -1,0 +1,12 @@
+{
+    "name": "subtitle-source",
+    "main": "subtitle-source.js",
+    "typings": "subtitle-source.d.ts",
+    "version": "0.1.0",
+    "nativescript": {
+        "platforms": {
+            "android": "1.7.0",
+            "ios": "1.7.0"
+        }
+    }
+}

@@ -29,3 +29,8 @@ node_modules/
 *.gz
 *.zip
 *.stackdump
+src/package*/
+
+!src/videoplayer.d.ts
+!src/subtitle-source/subtitle-source.d.ts
+!src/video-source/video-source.d.ts

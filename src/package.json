@@ -2,7 +2,7 @@
   "name": "nativescript-exoplayer",
   "version": "3.4.0",
   "main": "videoplayer",
-  "typings": "index.d.ts",
+  "typings": "videoplayer.d.ts",
   "description": "A NativeScript plugin that uses the ExoPlayer video player on Android to play local and remote videos.",
   "nativescript": {
     "platforms": {
@@ -29,7 +29,7 @@
     "video player",
     "movie",
     "exoplayer",
-	"subtitles"
+    "subtitles"
   ],
   "contributors": [
     {
@@ -67,11 +67,11 @@
       "email": "asemenovboyarka@gmail.com",
       "url": "https://github.com/SemenovAlexander"
     },
-	{
-	  "name": "Nathan Walker",
-	  "email": "walkerrunpdx@gmail.com",
-	  "url": "https://github.com/NathanWalker"
-	}
+    {
+      "name": "Nathan Walker",
+      "email": "walkerrunpdx@gmail.com",
+      "url": "https://github.com/NathanWalker"
+    }
   ],
   "author": {
     "name": "Nathanael Anderson",
@@ -84,6 +84,13 @@
   },
   "homepage": "https://github.com/nathanaela/nativescript-exoplayer",
   "readmeFilename": "README.md",
+  "scripts": {
+    "tsc": "tsc",
+    "prepack": "tsc"
+  },
+  "peerDependencies": {
+    "tns-core-modules": "^3.0.0"
+  },
   "devDependencies": {
     "tns-core-modules": "^3.0.0",
     "tns-platform-declarations": "^3.0.0",

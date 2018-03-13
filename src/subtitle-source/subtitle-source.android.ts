@@ -25,6 +25,7 @@ declare var android: any;
 
 export class SubtitleSource implements definition.SubtitleSource {
     public android: any; /// String - url or resource
+    public ios: any; /// NSString
 
     public loadFromResource(name: string): boolean {
         this.android = null;
