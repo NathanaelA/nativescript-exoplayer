@@ -29,7 +29,7 @@
     "video player",
     "movie",
     "exoplayer",
-	"subtitles"
+    "subtitles"
   ],
   "contributors": [
     {
@@ -67,11 +67,11 @@
       "email": "asemenovboyarka@gmail.com",
       "url": "https://github.com/SemenovAlexander"
     },
-	{
-	  "name": "Nathan Walker",
-	  "email": "walkerrunpdx@gmail.com",
-	  "url": "https://github.com/NathanWalker"
-	}
+    {
+      "name": "Nathan Walker",
+      "email": "walkerrunpdx@gmail.com",
+      "url": "https://github.com/NathanWalker"
+    }
   ],
   "author": {
     "name": "Nathanael Anderson",
@@ -88,7 +88,7 @@
     "tsc": "tsc",
     "prepack": "tsc"
   },
-    "peerDependencies": {
+  "peerDependencies": {
     "tns-core-modules": "^3.0.0"
   },
   "devDependencies": {
