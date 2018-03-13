@@ -235,9 +235,13 @@ export class Video extends videoCommon.Video {
         if (this._player.currentItem && this._player.currentItem.status === AVPlayerItemStatus.ReadyToPlay) {
             let seconds = ms / 1000.0;
             let time = CMTimeMakeWithSeconds(seconds, this._player.currentTime().timescale);
-            this._player.seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time, kCMTimeZero, kCMTimeZero, (isFinished) => {
-                this._emit(videoCommon.Video.seekToTimeCompleteEvent);
-            });
+            try {
+                this._player.seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time, kCMTimeZero, kCMTimeZero, (isFinished) => {
+                    this._emit(videoCommon.Video.seekToTimeCompleteEvent);
+                });
+            } catch (e) {
+                console.error(e);
+            }
         } else {
             console.log("AVPlayerItem cannot service a seek request with a completion handler until its status is ReadyToPlay.")
         }
