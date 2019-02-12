@@ -326,32 +326,32 @@ export class Video extends videoCommon.Video {
 	}
 
 	private _setupAspectRatio(): void {
-
-		let viewWidth = this._textureView.getWidth();
-		let viewHeight = this._textureView.getHeight();
-		let aspectRatio = this.videoHeight / this.videoWidth;
-
-		let newWidth;
-		let newHeight;
-		if (viewHeight > (viewWidth * aspectRatio)) {
-			// limited by narrow width; restrict height
-			newWidth = viewWidth;
-			newHeight = (viewWidth * aspectRatio);
-		} else {
-			// limited by short height; restrict width
-			newWidth = (viewHeight / aspectRatio);
-			newHeight = viewHeight;
-		}
-
-		let xoff = (viewWidth - newWidth) / 2;
-		let yoff = (viewHeight - newHeight) / 2;
-
-		let txform = new android.graphics.Matrix();
-		this._textureView.getTransform(txform);
-		txform.setScale(newWidth / viewWidth, newHeight / viewHeight);
-		txform.postTranslate(xoff, yoff);
-		this._textureView.setTransform(txform);
-
+    if (this._textureView) {
+      let viewWidth = this._textureView.getWidth();
+      let viewHeight = this._textureView.getHeight();
+      let aspectRatio = this.videoHeight / this.videoWidth;
+  
+      let newWidth;
+      let newHeight;
+      if (viewHeight > (viewWidth * aspectRatio)) {
+        // limited by narrow width; restrict height
+        newWidth = viewWidth;
+        newHeight = (viewWidth * aspectRatio);
+      } else {
+        // limited by short height; restrict width
+        newWidth = (viewHeight / aspectRatio);
+        newHeight = viewHeight;
+      }
+  
+      let xoff = (viewWidth - newWidth) / 2;
+      let yoff = (viewHeight - newHeight) / 2;
+  
+      let txform = new android.graphics.Matrix();
+      this._textureView.getTransform(txform);
+      txform.setScale(newWidth / viewWidth, newHeight / viewHeight);
+      txform.postTranslate(xoff, yoff);
+      this._textureView.setTransform(txform);
+    }
 	}
 
 	private _detectTypeFromSrc(uri: any): number {
