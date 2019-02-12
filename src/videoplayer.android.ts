@@ -1,4 +1,6 @@
-﻿import videoCommon = require("./videoplayer-common");
+﻿
+
+import videoCommon = require("./videoplayer-common");
 import { videoSourceProperty } from "./videoplayer-common";
 import { subtitleSourceProperty } from "./videoplayer-common";
 //import videoSource = require("./video-source/video-source");
@@ -39,11 +41,11 @@ export class Video extends videoCommon.Video {
 	private lastTimerUpdate: number;
 	private interval: number;
 	private _suspendLocation: number;
-    private _boundStart = this.resumeEvent.bind(this);
-    private _boundStop = this.suspendEvent.bind(this);
-    private enableSubtitles: boolean = false;
+	private _boundStart = this.resumeEvent.bind(this);
+	private _boundStop = this.suspendEvent.bind(this);
+	private enableSubtitles: boolean = false;
 
-    public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
+	public TYPE = {DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4};
 	public nativeView: any;
 
 
@@ -70,10 +72,12 @@ export class Video extends videoCommon.Video {
 		this.eventPlaybackStart = false;
 		this.lastTimerUpdate = -1;
 		this.interval = null;
-    }
+	}
 
 	get playState(): any {
-		if (!this.mediaPlayer) { return STATE_IDLE; }
+		if (!this.mediaPlayer) {
+			return STATE_IDLE;
+		}
 		return this.mediaPlayer.getPlaybackState();
 	}
 
@@ -166,7 +170,9 @@ export class Video extends videoCommon.Video {
 
 				onSurfaceTextureDestroyed: function (/* surface */) {
 					// after we return from this we can't use the surface any more
-					if (!this.owner) { return true; }
+					if (!this.owner) {
+						return true;
+					}
 					if (this.owner.textureSurface !== null) {
 						this.owner.textureSurfaceSet = false;
 						this.owner.textureSurface.release();
@@ -186,23 +192,24 @@ export class Video extends videoCommon.Video {
 			}
 		));
 
-        application.on(application.suspendEvent, this._boundStop);
-        application.on(application.resumeEvent, this._boundStart);
+		application.on(application.suspendEvent, this._boundStop);
+		application.on(application.resumeEvent, this._boundStart);
 
-    }
+	}
 
-    public disposeNativeView()
-    {
-        this.disableEventTracking();
-    }
+	public disposeNativeView() {
+		this.disableEventTracking();
+	}
 
-    public disableEventTracking() {
-        application.off(application.suspendEvent, this._boundStop);
-        application.off(application.resumeEvent, this._boundStart);
-    }
+	public disableEventTracking() {
+		application.off(application.suspendEvent, this._boundStop);
+		application.off(application.resumeEvent, this._boundStart);
+	}
 
-    public toggleMediaControllerVisibility(): void {
-		if (!this.mediaController || !this.mediaPlayer) { return; }
+	public toggleMediaControllerVisibility(): void {
+		if (!this.mediaController || !this.mediaPlayer) {
+			return;
+		}
 		if (this.mediaController.isVisible()) {
 			this.mediaController.hide();
 		} else {
@@ -246,7 +253,9 @@ export class Video extends videoCommon.Video {
 			},
 			onPlayerStateChanged: function (playWhenReady, playbackState) {
 				// console.log("OnPlayerStateChanged", playWhenReady, playbackState);
-				if (!this.owner) { return; }
+				if (!this.owner) {
+					return;
+				}
 				if (!this.owner.textureSurfaceSet) {
 					this.owner._setupTextureSurface();
 				}
@@ -273,8 +282,7 @@ export class Video extends videoCommon.Video {
 						this.owner.eventPlaybackStart = true;
 						// this.owner._emit(videoCommon.Video.playbackStartEvent);
 					}
-				}
-				else if (playbackState === STATE_ENDED) {
+				} else if (playbackState === STATE_ENDED) {
 					if (!this.owner.loop) {
 						this.owner.eventPlaybackStart = false;
 						this.owner.stopCurrentTimer();
@@ -297,9 +305,6 @@ export class Video extends videoCommon.Video {
 			},
 			onTracksChanged: function (/* trackGroups, trackSelections */) {
 				// Do nothing
-			},
-			onSeekProcessed: function(){
-				// Do nothing
 			}
 		});
 		this.mediaPlayer.setVideoListener(vidListener);
@@ -318,49 +323,54 @@ export class Video extends videoCommon.Video {
 				params.addRule(12); // Align bottom
 
 				this.mediaController.setLayoutParams(params);
-			}
-			else {
+			} else {
 				return;
 			}
 		}
 	}
 
 	private _setupAspectRatio(): void {
-    if (this._textureView) {
-      let viewWidth = this._textureView.getWidth();
-      let viewHeight = this._textureView.getHeight();
-      let aspectRatio = this.videoHeight / this.videoWidth;
-  
-      let newWidth;
-      let newHeight;
-      if (viewHeight > (viewWidth * aspectRatio)) {
-        // limited by narrow width; restrict height
-        newWidth = viewWidth;
-        newHeight = (viewWidth * aspectRatio);
-      } else {
-        // limited by short height; restrict width
-        newWidth = (viewHeight / aspectRatio);
-        newHeight = viewHeight;
-      }
-  
-      let xoff = (viewWidth - newWidth) / 2;
-      let yoff = (viewHeight - newHeight) / 2;
-  
-      let txform = new android.graphics.Matrix();
-      this._textureView.getTransform(txform);
-      txform.setScale(newWidth / viewWidth, newHeight / viewHeight);
-      txform.postTranslate(xoff, yoff);
-      this._textureView.setTransform(txform);
-    }
+		if (!this._textureView) {
+			return
+		}
+		let viewWidth = this._textureView.getWidth();
+		let viewHeight = this._textureView.getHeight();
+		let aspectRatio = this.videoHeight / this.videoWidth;
+
+		let newWidth;
+		let newHeight;
+		if (viewHeight > (viewWidth * aspectRatio)) {
+			// limited by narrow width; restrict height
+			newWidth = viewWidth;
+			newHeight = (viewWidth * aspectRatio);
+		} else {
+			// limited by short height; restrict width
+			newWidth = (viewHeight / aspectRatio);
+			newHeight = viewHeight;
+		}
+
+		let xoff = (viewWidth - newWidth) / 2;
+		let yoff = (viewHeight - newHeight) / 2;
+
+		let txform = new android.graphics.Matrix();
+		this._textureView.getTransform(txform);
+		txform.setScale(newWidth / viewWidth, newHeight / viewHeight);
+		txform.postTranslate(xoff, yoff);
+		this._textureView.setTransform(txform);
+
 	}
 
 	private _detectTypeFromSrc(uri: any): number {
 		let type = com.google.android.exoplayer2.util.Util.inferContentType(uri);
 		switch (type) {
-			case 0: return this.TYPE.DASH;
-			case 1: return this.TYPE.SS;
-			case 2: return this.TYPE.HLS;
-			default: return this.TYPE.OTHER;
+			case 0:
+				return this.TYPE.DASH;
+			case 1:
+				return this.TYPE.SS;
+			case 2:
+				return this.TYPE.HLS;
+			default:
+				return this.TYPE.OTHER;
 		}
 	}
 
@@ -426,8 +436,7 @@ export class Video extends videoCommon.Video {
 				/* if (this.loop) {
 					vs = new com.google.android.exoplayer2.source.LoopingMediaSource(vs);
 				} */
-			}
-			else if (typeof this._src.typeSource === "number") {
+			} else if (typeof this._src.typeSource === "number") {
 				uri = android.net.Uri.parse(this._src.url);
 				switch (this._src.typeSource) {
 					case this.TYPE.SS:
@@ -501,8 +510,7 @@ export class Video extends videoCommon.Video {
 			}
 			this.mediaState = SURFACE_READY;
 
-		}
-		catch (ex) {
+		} catch (ex) {
 			console.log("Error:", ex, ex.stack);
 		}
 	}
@@ -532,8 +540,7 @@ export class Video extends videoCommon.Video {
 	public play(): void {
 		if (!this.mediaPlayer || this.mediaState === SURFACE_WAITING) {
 			this._openVideo();
-		}
-		else if (this.playState === STATE_ENDED) {
+		} else if (this.playState === STATE_ENDED) {
 			this.eventPlaybackStart = false;
 			this.mediaPlayer.seekToDefaultPosition();
 			this.startCurrentTimer();
@@ -553,8 +560,7 @@ export class Video extends videoCommon.Video {
 		if (this.mediaPlayer) {
 			if (mute === true) {
 				this.mediaPlayer.setVolume(0);
-			}
-			else if (mute === false) {
+			} else if (mute === false) {
 				this.mediaPlayer.setVolume(1);
 			}
 		}
@@ -569,7 +575,9 @@ export class Video extends videoCommon.Video {
 	}
 
 	private _addReadyEvent(value: any) {
-		if (this._onReadyEmitEvent.indexOf(value)) { return; }
+		if (this._onReadyEmitEvent.indexOf(value)) {
+			return;
+		}
 		this._onReadyEmitEvent.push(value);
 	}
 
@@ -579,18 +587,19 @@ export class Video extends videoCommon.Video {
 		if (!this.mediaPlayer) {
 			this.preSeekTime = ms;
 			return;
-		}
-		else {
+		} else {
 			this.preSeekTime = -1;
 		}
 		this.mediaPlayer.seekTo(ms);
 	}
 
 	public isPlaying(): boolean {
-		if (!this.mediaPlayer) { return false; }
+		if (!this.mediaPlayer) {
+			return false;
+		}
 		if (this.playState === STATE_READY) {
-		    return this.mediaPlayer.getPlayWhenReady();
-        }
+			return this.mediaPlayer.getPlayWhenReady();
+		}
 		return false;
 	}
 
@@ -599,8 +608,11 @@ export class Video extends videoCommon.Video {
 			return 0;
 		}
 		let duration = this.mediaPlayer.getDuration();
-		if (isNaN(duration)) { return 0; }
-		else { return duration; }
+		if (isNaN(duration)) {
+			return 0;
+		} else {
+			return duration;
+		}
 	}
 
 	public getCurrentTime(): number {

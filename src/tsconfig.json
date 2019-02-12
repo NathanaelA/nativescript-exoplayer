@@ -18,16 +18,16 @@
         "baseUrl": ".",
         "paths": {
             "*": [
-                "./node_modules/tns-core-modules/*",
-                "./node_modules/*"
+                "../demo/node_modules/tns-core-modules/*",
+                "../demo/node_modules/*"
             ]
         },
       "skipLibCheck": true
     },
     "files": [
         // reference
-        "node_modules/tns-platform-declarations/android.d.ts",
-        "node_modules/tns-platform-declarations/ios.d.ts",
+        "../demo/node_modules/tns-platform-declarations/android.d.ts",
+        "../demo/node_modules/tns-platform-declarations/ios.d.ts",
         // sources
         "videoplayer-common.ts",
         "videoplayer.ios.ts",
