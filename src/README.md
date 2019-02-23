@@ -105,9 +105,16 @@ Mutes the native video player.
 
 Sets the native video player to loop once playback has finished.
 
-- **fill - (boolean)** - *optional*  **ANDROID ONLY**
+- **fill - (VideoFill)** - *optional*
 
-If set to true, the aspect ratio of the video will not be honored and it will fill the entire space available.
+Android: When set to VideoFill.aspectFill, the aspect ratio of the video will not be honored and it will fill the entire space available.
+
+iOS: 
+* VideoFill.default = AVLayerVideoGravityResize
+* VideoFill.aspect = AVLayerVideoGravityResizeAspect
+* VideoFill.aspectFill = AVLayerVideoGravityResizeAspectFill
+
+See [here for explanation](https://developer.apple.com/documentation/avfoundation/avlayervideogravity).
 
 - **playbackReady - (function)** - *optional*
 

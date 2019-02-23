@@ -1,13 +1,15 @@
-import { Observable } from "data/observable";
-import { Page } from "ui/page";
-import { isAndroid } from "platform";
-import { setInterval } from "timer";
+import { Observable } from "tns-core-modules/data/observable";
+import { Page } from "tns-core-modules/ui/page";
+import { isAndroid } from "tns-core-modules/platform";
+import { setInterval } from "tns-core-modules/timer";
+import { VideoFill } from "nativescript-exoplayer";
 
 export class HelloWorldModel extends Observable {
   public videoSrc: string;
   public subtitlesSrc: string;
   public currentTime: any;
   public videoDuration: any;
+  public videoFill: VideoFill = VideoFill.default;
   private _videoPlayer: any;
   private completed: boolean;
 

@@ -1,10 +1,9 @@
-﻿import videoSource = require("./video-source/video-source");
-import subtitleSource = require("./subtitle-source/subtitle-source");
-import * as definitions from "./videoplayer";
-import { isFileOrResourcePath } from "utils/utils"
-import { isString } from "utils/types"
-import { View, Property, booleanConverter } from "ui/core/view";
-import imageSource = require('image-source');
+﻿import * as videoSource from "./video-source/video-source";
+import * as subtitleSource from "./subtitle-source/subtitle-source";
+import { isFileOrResourcePath } from "tns-core-modules/utils/utils";
+import { isString } from "tns-core-modules/utils/types"
+import { View, Property, booleanConverter } from "tns-core-modules/ui/core/view";
+import * as imageSource from "tns-core-modules/image-source";
 
 // on Android we explicitly set propertySettings to None because android will invalidate its layout (skip unnecessary native call).
 // var AffectsLayout = platform.device.os === platform.platformNames.android ? dependencyObservable.PropertyMetadataSettings.None : dependencyObservable.PropertyMetadataSettings.AffectsLayout;
@@ -72,6 +71,15 @@ function onImgSrcPropertyChanged(view, oldValue, newValue) {
     }
 }
 
+/**
+ * Video aspect/fill handling
+ */
+export enum VideoFill {
+  default = "default",
+  aspect = "aspect",
+  aspectFill = "aspectFill"
+}
+
 export class Video extends View {
     public static finishedEvent: string = "finished";
     public static playbackReadyEvent: string = "playbackReady";
@@ -92,7 +100,7 @@ export class Video extends View {
     public controls: boolean = true; /// set true to enable the media player's playback controls
     public loop: boolean = false; /// whether the video loops the playback after extends
     public muted: boolean = false;
-    public fill: boolean = false;
+    public fill: VideoFill = VideoFill.default;
 
     public static IMAGETYPEMONO = 1;
     public static IMAGETYPESTEREOTOPBOTTOM = 2;
@@ -175,8 +183,7 @@ export const mutedProperty = new Property<Video, boolean>({
 });
 mutedProperty.register(Video);
 
-export const fillProperty = new Property<Video, boolean>({
-    name: "fill",
-    valueConverter: booleanConverter,
+export const fillProperty = new Property<Video, VideoFill>({
+    name: "fill"
 });
 fillProperty.register(Video);

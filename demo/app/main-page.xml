@@ -5,14 +5,8 @@
   <ScrollView>
     <StackLayout>
       <Button text="Change Video" tap="{{ changeVideoSource }}" />
-      <GridLayout rows="auto" columns="auto,*,auto,auto" margin="10">
-        <Label text="Current Time: " textWrap="true" />
-        <Label col="1" text="{{ currentTime }}" class="message" textWrap="true" />
-        <Label col="2" text="Video Duration: " textWrap="true" />
-        <Label col="3" text="{{ videoDuration }}" class="message" textWrap="true" />
-      </GridLayout>
       <GridLayout rows="*" columns="*, *" backgroundColor="#000000">
-        <Video:Video id="nativeVideoPlayer" controls="true" loadingComplete="{{ videoCompleted }}" playbackStart="{{ playbackStart }}" finished="{{ videoFinished }}" loop="false" autoplay="true" height="280" src="{{ videoSrc }}" subtitles="{{ subtitlesSrc }}" row="0" colSpan="2"/>
+        <Video:Video id="nativeVideoPlayer" controls="true" loadingComplete="{{ videoCompleted }}" playbackStart="{{ playbackStart }}" finished="{{ videoFinished }}" loop="false" autoplay="true" height="280" fill="{{ videoFill }}" src="{{ videoSrc }}" subtitles="{{ subtitlesSrc }}" row="0" colSpan="2"/>
         <Label text="Label On Top of Video View" row="0" colSpan="2" color="#fff" horizontalAlignment="center"/>
       </GridLayout>
       <StackLayout orientation="horizontal">
@@ -33,6 +27,12 @@
         <Button text="Go to 30 seconds" width="33%" tap="{{ goToTime }}" />
       </StackLayout>
       <Button text="Animate" width="33%" tap="{{ animate }}"/>
+      <GridLayout rows="auto" columns="auto,*,auto,auto" margin="10">
+        <Label text="Current Time: " textWrap="true" />
+        <Label col="1" text="{{ currentTime }}" class="message" textWrap="true" />
+        <Label col="2" text="Video Duration: " textWrap="true" />
+        <Label col="3" text="{{ videoDuration }}" class="message" textWrap="true" />
+      </GridLayout>
     </StackLayout>
   </ScrollView>
 </Page>

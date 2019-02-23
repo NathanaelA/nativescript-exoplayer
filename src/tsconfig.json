@@ -6,14 +6,15 @@
         "noImplicitAny": false,
         "removeComments": true,
         "preserveConstEnums": true,
-        "declaration": false,
+        "declaration": true,
         "noLib": false,
         "noEmitHelpers": true,
         "experimentalDecorators": true,
         "noEmitOnError": false,
         "lib": [
-            "es6",
-            "dom"
+          "es2017",
+          "dom",
+          "es6"
         ],
         "baseUrl": ".",
         "paths": {
@@ -29,6 +30,7 @@
         "../demo/node_modules/tns-platform-declarations/android.d.ts",
         "../demo/node_modules/tns-platform-declarations/ios.d.ts",
         // sources
+        "videoplayer.d.ts",
         "videoplayer-common.ts",
         "videoplayer.ios.ts",
         "videoplayer.android.ts",
