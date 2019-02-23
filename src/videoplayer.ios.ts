@@ -1,7 +1,5 @@
-﻿import videoCommon = require("./videoplayer-common");
-import { ios } from "application"
-import { videoSourceProperty } from "./videoplayer-common";
-import { subtitleSourceProperty } from "./videoplayer-common";
+﻿import { ios } from "tns-core-modules/application";
+import { Video as VideoBase, VideoFill, videoSourceProperty, fillProperty, subtitleSourceProperty } from "./videoplayer-common";
 
 export * from "./videoplayer-common";
 
@@ -15,7 +13,7 @@ declare const
     UILabel,
     CMTimeMake;
 
-export class Video extends videoCommon.Video {
+export class Video extends VideoBase {
     private _player: any; /// AVPlayer
     private _playerController: any; /// AVPlayerViewController
     private _src: string;
@@ -75,6 +73,21 @@ export class Video extends videoCommon.Video {
 
     [videoSourceProperty.setNative](value: AVPlayerItem) {
         this._setNativeVideo(value ? (<any>value).ios : null);
+    }
+
+    [fillProperty.setNative](value: VideoFill) {
+      let videoGravity = AVLayerVideoGravityResize; // default
+      switch (value) {
+        case VideoFill.aspect:
+          videoGravity = AVLayerVideoGravityResizeAspect;
+          break;
+        case VideoFill.aspectFill:
+          videoGravity = AVLayerVideoGravityResizeAspectFill;
+          break;
+      }
+      if (this._playerController) {
+        this._playerController.videoGravity = videoGravity;
+      }
     }
 
     [subtitleSourceProperty.setNative](value: NSString) {
@@ -197,7 +210,7 @@ export class Video extends videoCommon.Video {
         if (this._player.currentItem && this._player.currentItem === notification.object) {
             // This will match exactly to the object from the notification so can ensure only looping and finished event for the video that has finished.
             // Notification is structured like so: NSConcreteNotification 0x61000024f690 {name = AVPlayerItemDidPlayToEndTimeNotification; object = <AVPlayerItem: 0x600000204190, asset = <AVURLAsset: 0x60000022b7a0, URL = https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4>>}
-            this._emit(videoCommon.Video.finishedEvent);
+            this._emit(VideoBase.finishedEvent);
             this._videoFinished = true;
             if (this.loop === true && this._player !== null) {
                 // Go in 5ms for more seamless looping
@@ -237,7 +250,7 @@ export class Video extends videoCommon.Video {
             let time = CMTimeMakeWithSeconds(seconds, this._player.currentTime().timescale);
             try {
                 this._player.seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time, kCMTimeZero, kCMTimeZero, (isFinished) => {
-                    this._emit(videoCommon.Video.seekToTimeCompleteEvent);
+                    this._emit(VideoBase.seekToTimeCompleteEvent);
                 });
             } catch (e) {
                 console.error(e);
@@ -325,12 +338,12 @@ export class Video extends videoCommon.Video {
 
     playbackReady() {
         this._videoLoaded = true;
-        this._emit(videoCommon.Video.playbackReadyEvent);
+        this._emit(VideoBase.playbackReadyEvent);
     }
 
     playbackStart() {
         this._videoPlaying = true;
-        this._emit(videoCommon.Video.playbackStartEvent);
+        this._emit(VideoBase.playbackStartEvent);
     }
 
 }

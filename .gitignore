@@ -31,6 +31,8 @@ node_modules/
 *.stackdump
 src/package*/
 
+package-lock.json
+
 !src/videoplayer.d.ts
 !src/subtitle-source/subtitle-source.d.ts
 !src/video-source/video-source.d.ts

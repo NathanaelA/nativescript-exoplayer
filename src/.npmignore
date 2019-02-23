@@ -20,3 +20,4 @@ README.md
 *.map
 *.stackdump
 package*/
+package-lock.json

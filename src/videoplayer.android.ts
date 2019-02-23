@@ -1,12 +1,8 @@
 ﻿
 
-import videoCommon = require("./videoplayer-common");
-import { videoSourceProperty } from "./videoplayer-common";
-import { subtitleSourceProperty } from "./videoplayer-common";
-//import videoSource = require("./video-source/video-source");
-//import timer = require("timer");
-import utils = require("utils/utils");
-const application = require('application');
+import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourceProperty } from "./videoplayer-common";
+import * as nsUtils from "tns-core-modules/utils/utils";
+import * as nsApp from "tns-core-modules/application";
 
 export * from "./videoplayer-common";
 
@@ -21,7 +17,7 @@ const STATE_ENDED: number = 4;
 const SURFACE_WAITING: number = 0;
 const SURFACE_READY: number = 1;
 
-export class Video extends videoCommon.Video {
+export class Video extends VideoBase {
 	private _textureView: any; /// android.widget.VideoView
 	private _subtitlesView: any; /// com.google.android.exoplayer2.ui.SubtitleView
 	private videoWidth: number;
@@ -192,8 +188,8 @@ export class Video extends videoCommon.Video {
 			}
 		));
 
-		application.on(application.suspendEvent, this._boundStop);
-		application.on(application.resumeEvent, this._boundStart);
+		nsApp.on(nsApp.suspendEvent, this._boundStop);
+		nsApp.on(nsApp.resumeEvent, this._boundStart);
 
 	}
 
@@ -202,8 +198,8 @@ export class Video extends videoCommon.Video {
 	}
 
 	public disableEventTracking() {
-		application.off(application.suspendEvent, this._boundStop);
-		application.off(application.resumeEvent, this._boundStart);
+		nsApp.off(nsApp.suspendEvent, this._boundStop);
+		nsApp.off(nsApp.resumeEvent, this._boundStart);
 	}
 
 	public toggleMediaControllerVisibility(): void {
@@ -228,14 +224,14 @@ export class Video extends videoCommon.Video {
 				// Once the first frame has rendered it is ready to start playing...
 				if (this.owner && !this.owner.eventPlaybackReady) {
 					this.owner.eventPlaybackReady = true;
-					this.owner._emit(videoCommon.Video.playbackReadyEvent);
+					this.owner._emit(VideoBase.playbackReadyEvent);
 				}
 			},
 			onVideoSizeChanged: function (width, height /*, unappliedRotationDegrees, pixelWidthHeightRatio */) {
 				if (this.owner) {
 					this.owner.videoWidth = width;
 					this.owner.videoHeight = height;
-					if (this.owner.fill !== true) {
+					if (this.owner.fill !== VideoFill.aspectFill) {
 						this.owner._setupAspectRatio();
 					}
 				}
@@ -271,7 +267,7 @@ export class Video extends videoCommon.Video {
 					// We have to fire this from here in the event the textureSurface isn't set yet...
 					if (!this.owner.textureSurfaceSet && !this.owner.eventPlaybackReady) {
 						this.owner.eventPlaybackReady = true;
-						this.owner._emit(videoCommon.Video.playbackReadyEvent);
+						this.owner._emit(VideoBase.playbackReadyEvent);
 					}
 					if (this.owner._onReadyEmitEvent.length) {
 						do {
@@ -280,14 +276,14 @@ export class Video extends videoCommon.Video {
 					}
 					if (playWhenReady && !this.owner.eventPlaybackStart) {
 						this.owner.eventPlaybackStart = true;
-						// this.owner._emit(videoCommon.Video.playbackStartEvent);
+						// this.owner._emit(VideoBase.playbackStartEvent);
 					}
 				} else if (playbackState === STATE_ENDED) {
 					if (!this.owner.loop) {
 						this.owner.eventPlaybackStart = false;
 						this.owner.stopCurrentTimer();
 					}
-					this.owner._emit(videoCommon.Video.finishedEvent);
+					this.owner._emit(VideoBase.finishedEvent);
 					if (this.owner.loop) {
 						this.owner.play();
 					}
@@ -386,7 +382,7 @@ export class Video extends videoCommon.Video {
 
 		this.videoOpened = true; // we don't want to come back in here from texture system...
 
-		let am = utils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+		let am = nsUtils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
 		am.requestAudioFocus(null, android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.AUDIOFOCUS_GAIN);
 		try {
 			let bm = new com.google.android.exoplayer2.upstream.DefaultBandwidthMeter();
@@ -582,7 +578,7 @@ export class Video extends videoCommon.Video {
 	}
 
 	public seekToTime(ms: number): void {
-		this._addReadyEvent(videoCommon.Video.seekToTimeCompleteEvent);
+		this._addReadyEvent(VideoBase.seekToTimeCompleteEvent);
 
 		if (!this.mediaPlayer) {
 			this.preSeekTime = ms;
@@ -650,7 +646,7 @@ export class Video extends videoCommon.Video {
 			if (this.mediaController && this.mediaController.isVisible()) {
 				this.mediaController.hide();
 			}
-			let am = utils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+			let am = nsUtils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
 			am.abandonAudioFocus(null);
 		}
 	}
@@ -685,7 +681,7 @@ export class Video extends videoCommon.Video {
 		let curTimer = this.mediaPlayer.getCurrentPosition();
 		if (curTimer !== this.lastTimerUpdate) {
 			this.notify({
-				eventName: videoCommon.Video.currentTimeUpdatedEvent,
+				eventName: VideoBase.currentTimeUpdatedEvent,
 				object: this,
 				position: curTimer
 			});
