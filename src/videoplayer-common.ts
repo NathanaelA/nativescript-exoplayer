@@ -2,11 +2,15 @@
 import * as subtitleSource from "./subtitle-source/subtitle-source";
 import { isFileOrResourcePath } from "tns-core-modules/utils/utils";
 import { isString } from "tns-core-modules/utils/types"
-import { View, Property, booleanConverter } from "tns-core-modules/ui/core/view";
+import { View, Property, booleanConverter, EventData } from "tns-core-modules/ui/core/view";
 import * as imageSource from "tns-core-modules/image-source";
 
 // on Android we explicitly set propertySettings to None because android will invalidate its layout (skip unnecessary native call).
 // var AffectsLayout = platform.device.os === platform.platformNames.android ? dependencyObservable.PropertyMetadataSettings.None : dependencyObservable.PropertyMetadataSettings.AffectsLayout;
+
+export interface VideoEventData extends EventData {
+  data?: any
+}
 
 function onSrcPropertyChanged(view, oldValue, newValue) {
 
@@ -86,6 +90,7 @@ export class Video extends View {
     public static playbackStartEvent: string = "playbackStart";
     public static seekToTimeCompleteEvent: string = "seekToTimeComplete";
     public static currentTimeUpdatedEvent: string = "currentTimeUpdated";
+    public static chaptersLoadedEvent: string = "chaptersLoaded";
 
     public _emit: any;
     public android: any;
@@ -101,6 +106,7 @@ export class Video extends View {
     public loop: boolean = false; /// whether the video loops the playback after extends
     public muted: boolean = false;
     public fill: VideoFill = VideoFill.default;
+    public detectChapters: boolean = false;
 
     public static IMAGETYPEMONO = 1;
     public static IMAGETYPESTEREOTOPBOTTOM = 2;

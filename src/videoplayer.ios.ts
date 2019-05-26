@@ -1,5 +1,5 @@
 ﻿import { ios } from "tns-core-modules/application";
-import { Video as VideoBase, VideoFill, videoSourceProperty, fillProperty, subtitleSourceProperty } from "./videoplayer-common";
+import { Video as VideoBase, VideoFill, videoSourceProperty, fillProperty, subtitleSourceProperty, VideoEventData } from "./videoplayer-common";
 
 export * from "./videoplayer-common";
 
@@ -234,7 +234,9 @@ export class Video extends VideoBase {
     }
 
     public pause() {
-        this._player.pause();
+        if (this._player) {
+            this._player.pause();
+        }
         if (this._playbackTimeObserverActive) {
             this._removePlaybackTimeObserver();
         }
@@ -261,25 +263,32 @@ export class Video extends VideoBase {
     }
 
     public getDuration(): number {
+        if (!this._player) {
+            return 0;
+        }
         let seconds = CMTimeGetSeconds(this._player.currentItem.asset.duration);
         let milliseconds = seconds * 1000.0;
         return milliseconds;
     }
 
     public getCurrentTime(): any {
-        if (this._player === null) {
-            return false;
+        if (!this._player) {
+            return 0;
         }
         return (this._player.currentTime().value / this._player.currentTime().timescale) * 1000;
     }
 
     public setVolume(volume: number) {
-        this._player.volume = volume;
+        if (this._player) {
+          this._player.volume = volume;
+        }
     }
 
     public destroy() {
 
-        this._removeStatusObserver(this._player.currentItem);
+        if (this._player) {
+          this._removeStatusObserver(this._player.currentItem);
+        }
 
         if (this._didPlayToEndTimeActive) {
             ios.removeNotificationObserver(this._didPlayToEndTimeObserver, AVPlayerItemDidPlayToEndTimeNotification);
@@ -290,8 +299,12 @@ export class Video extends VideoBase {
             this._removePlaybackTimeObserver();
         }
 
+
         this.pause();
-        this._player.replaceCurrentItemWithPlayerItem(null); //de-allocates the AVPlayer
+        if (this._player) {
+            // de-allocates the AVPlayer
+            this._player.replaceCurrentItemWithPlayerItem(null); 
+        }
         this._playerController = null;
         this._player = null;
     }
@@ -327,7 +340,9 @@ export class Video extends VideoBase {
 
     private _removePlaybackTimeObserver() {
         this._playbackTimeObserverActive = false;
-        this._player.removeTimeObserver(this._playbackTimeObserver);
+        if (this._player) {
+          this._player.removeTimeObserver(this._playbackTimeObserver);
+        }
     }
 
     private _autoplayCheck() {
@@ -339,6 +354,27 @@ export class Video extends VideoBase {
     playbackReady() {
         this._videoLoaded = true;
         this._emit(VideoBase.playbackReadyEvent);
+
+        if (this.detectChapters) {
+          const playerItem = <AVPlayerItem>(<AVPlayer>this._player).currentItem;
+          const chapterLocalesKey = 'availableChapterLocales';
+          playerItem.asset.loadValuesAsynchronouslyForKeysCompletionHandler(NSArray.arrayWithArray([chapterLocalesKey]), () => {
+            let status = playerItem.asset.statusOfValueForKeyError(chapterLocalesKey);
+            if (status === AVKeyValueStatus.Loaded) {
+                let languages = NSLocale.preferredLanguages;
+                let chapterMetadata = playerItem.asset.chapterMetadataGroupsBestMatchingPreferredLanguages(languages);
+                // Emit chapter metadata for developers to work with
+                // TODO: could pre-parse them however likely be most versatile allowing dev's to parse however they'd like so no data is missed
+                this.notify(<VideoEventData>{
+                  eventName: VideoBase.chaptersLoadedEvent,
+                  object: this,
+                  data: chapterMetadata
+                });
+            } else {
+                // Handle other status cases
+            }
+          });
+        }
     }
 
     playbackStart() {
