@@ -412,7 +412,7 @@ export class Video extends VideoBase {
 			if (this._src instanceof String || typeof this._src === "string") {
 				uri = android.net.Uri.parse(this._src);
 
-				const type = this._detectTypeFromSrc(this._src);
+				const type = this._detectTypeFromSrc(uri);
 				switch (type) {
 					case this.TYPE.SS:
 						vs = new com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource(uri, dsf,
