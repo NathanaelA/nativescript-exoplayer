@@ -78,12 +78,6 @@ export declare class Video extends View {
   getCurrentTime(): number;
 
   /**
-   * Boolean to determine if observable for current time is registered.
-   * @param {boolean} observeCurrentTime - True to set observable on current time.
-   */
-  observeCurrentTime(observeCurrentTime: boolean): void;
-
-  /**
    * Observable for current time of the video duration in milliseconds.
    * @returns {number} Current time of the video duration.
    */
