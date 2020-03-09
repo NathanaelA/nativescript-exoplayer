@@ -39,7 +39,7 @@ function onSubtitlesPropertyChanged(view, oldValue, newValue) {
     if (isString(newValue)) {
         let value = newValue.trim();
         video.subtitleSource = null;
-        if (isFileOrResourcePath(value)){
+        if (isFileOrResourcePath(value)) {
             video.subtitleSource = subtitleSource.fromFileOrResource(value);
         } else {
             video.subtitleSource = subtitleSource.fromUrl(value);
@@ -75,9 +75,9 @@ function onImgSrcPropertyChanged(view, oldValue, newValue) {
  * Video aspect/fill handling
  */
 export enum VideoFill {
-  default = "default",
-  aspect = "aspect",
-  aspectFill = "aspectFill"
+    default = "default",
+    aspect = "aspect",
+    aspectFill = "aspectFill"
 }
 
 export class Video extends View {
@@ -91,6 +91,7 @@ export class Video extends View {
     public android: any;
     public ios: any;
     public src: string; /// video source file
+    public srcType: number = 0; /// video source file type
     public imgSrc: string;
     public imgType: number = 1;
     public subtitles: string; /// subtitles source file
@@ -113,6 +114,11 @@ export const srcProperty = new Property<Video, any>({
     valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
+
+export const srcTypeProperty = new Property<Video, any>({
+    name: "srcType"
+});
+srcTypeProperty.register(Video);
 
 export const imgSrcProperty = new Property<Video, any>({
     name: "imgSrc",

@@ -41,7 +41,7 @@ export class Video extends VideoBase {
 	private _boundStop = this.suspendEvent.bind(this);
 	private enableSubtitles: boolean = false;
 
-	public TYPE = {DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4};
+	public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 	public nativeView: any;
 
 
@@ -357,6 +357,12 @@ export class Video extends VideoBase {
 	}
 
 	private _detectTypeFromSrc(uri: any): number {
+		if (this.srcType > 0 && this.srcType <= 4) {
+			if (this.srcType == 1) return this.TYPE.SS;
+			if (this.srcType == 2) return this.TYPE.DASH;
+			if (this.srcType == 3) return this.TYPE.HLS;
+			if (this.srcType == 4) return this.TYPE.OTHER;
+		}
 		let type = com.google.android.exoplayer2.util.Util.inferContentType(uri);
 		switch (type) {
 			case 0:

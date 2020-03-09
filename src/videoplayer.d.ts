@@ -18,6 +18,7 @@ export declare class Video extends View {
    * video source file
    */
   src: string;
+  srcType: number;
   imgSrc: string;
   imgType: number;
   subtitles: string;
