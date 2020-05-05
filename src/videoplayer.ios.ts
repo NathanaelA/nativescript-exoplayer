@@ -37,15 +37,22 @@ export class Video extends VideoBase {
         this._playerController = new AVPlayerViewController();
 
         let audioSession = AVAudioSession.sharedInstance();
-        let output = audioSession.currentRoute.outputs.lastObject.portType;
+        try {
+            audioSession.setCategoryError(AVAudioSessionCategoryAmbient);
+            audioSession.setActiveError(true);
+        } catch (err) {
+
+        }
+        var output = audioSession.currentRoute.outputs.lastObject.portType;
         if (output.match(/Receiver/)) {
             try {
-              audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
-              audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverride.Speaker);
-              audioSession.setActiveError(true);
-              //console.log("audioSession category set and active");
+                // audioSession.setCategoryError(AVAudioSessionCategoryAmbient);
+                audioSession.overrideOutputAudioPortError(1936747378);
+                audioSession.setActiveError(true);
+                console.log('avvideo done')
             } catch (err) {
-              //console.log("setting audioSession category failed");
+                console.log('avvideo error');
+                console.log(err);
             }
         }
 
@@ -76,18 +83,18 @@ export class Video extends VideoBase {
     }
 
     [fillProperty.setNative](value: VideoFill) {
-      let videoGravity = AVLayerVideoGravityResize; // default
-      switch (value) {
-        case VideoFill.aspect:
-          videoGravity = AVLayerVideoGravityResizeAspect;
-          break;
-        case VideoFill.aspectFill:
-          videoGravity = AVLayerVideoGravityResizeAspectFill;
-          break;
-      }
-      if (this._playerController) {
-        this._playerController.videoGravity = videoGravity;
-      }
+        let videoGravity = AVLayerVideoGravityResize; // default
+        switch (value) {
+            case VideoFill.aspect:
+                videoGravity = AVLayerVideoGravityResizeAspect;
+                break;
+            case VideoFill.aspectFill:
+                videoGravity = AVLayerVideoGravityResizeAspectFill;
+                break;
+        }
+        if (this._playerController) {
+            this._playerController.videoGravity = videoGravity;
+        }
     }
 
     [subtitleSourceProperty.setNative](value: NSString) {
@@ -157,7 +164,7 @@ export class Video extends VideoBase {
         }
     }
 
-    private _setupSubtitleLabel(){
+    private _setupSubtitleLabel() {
         let contentOverlayView = this._playerController.contentOverlayView;
         this._subtitleLabel = new UILabel();
         this._subtitleLabelContainer = new UIView();
@@ -176,7 +183,7 @@ export class Video extends VideoBase {
         let containerViewsDictionary = new NSDictionary([this._subtitleLabel], ['subtitleLabel']);
 
         this._subtitleLabelContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("H:|-(5)-[subtitleLabel]-(5)-|", NSLayoutFormatOptions.DirectionLeadingToTrailing, null, containerViewsDictionary));
-        this._subtitleLabelContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:|-(0)-[subtitleLabel]-(0)-|", NSLayoutFormatOptions.DirectionLeadingToTrailing , null, containerViewsDictionary));
+        this._subtitleLabelContainer.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:|-(0)-[subtitleLabel]-(0)-|", NSLayoutFormatOptions.DirectionLeadingToTrailing, null, containerViewsDictionary));
 
 
         this._subtitleLabel.textColor = UIColor.whiteColor;
@@ -189,9 +196,9 @@ export class Video extends VideoBase {
 
         let viewsDictionary = new NSDictionary([this._subtitleLabelContainer, contentOverlayView], ['subtitleLabelContainer', 'superview']);
         // make 20 point insets from sides
-        contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("H:|-(>=20)-[subtitleLabelContainer]-(>=20)-|", 0 , null, viewsDictionary));
+        contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("H:|-(>=20)-[subtitleLabelContainer]-(>=20)-|", 0, null, viewsDictionary));
         // center text
-        contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:[superview]-(<=1)-[subtitleLabelContainer]",  NSLayoutFormatOptions.AlignAllCenterX, null, viewsDictionary));
+        contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:[superview]-(<=1)-[subtitleLabelContainer]", NSLayoutFormatOptions.AlignAllCenterX, null, viewsDictionary));
         // add 30 point margin from bottom
         contentOverlayView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormatOptionsMetricsViews("V:[subtitleLabelContainer]-(20)-|", 0, null, viewsDictionary));
     }
