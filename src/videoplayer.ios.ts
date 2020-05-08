@@ -37,16 +37,11 @@ export class Video extends VideoBase {
         this._playerController = new AVPlayerViewController();
 
         let audioSession = AVAudioSession.sharedInstance();
-        try {
-            audioSession.setCategoryError(AVAudioSessionCategoryAmbient);
-            audioSession.setActiveError(true);
-        } catch (err) {
 
-        }
         var output = audioSession.currentRoute.outputs.lastObject.portType;
         if (output.match(/Receiver/)) {
             try {
-                // audioSession.setCategoryError(AVAudioSessionCategoryAmbient);
+                audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
                 audioSession.overrideOutputAudioPortError(1936747378);
                 audioSession.setActiveError(true);
                 console.log('avvideo done')
@@ -107,6 +102,7 @@ export class Video extends VideoBase {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
             this._autoplayCheck();
+            this._backgroundAudioCheck();
             this._videoFinished = false;
             if (currentItem !== null) {
                 this._videoLoaded = false;
@@ -341,6 +337,23 @@ export class Video extends VideoBase {
         if (this.autoplay) {
             this.play();
         }
+    }
+
+    private _backgroundAudioCheck() {
+
+        try {
+            let audioSession = AVAudioSession.sharedInstance();
+            if (this.backgroundAudio) {
+                audioSession.setCategoryError(AVAudioSessionCategoryAmbient);
+            }
+            else {
+                audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
+            }
+            audioSession.setActiveError(true);
+        } catch (err) {
+
+        }
+
     }
 
     playbackReady() {
