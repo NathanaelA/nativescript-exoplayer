@@ -470,7 +470,7 @@ export class Video extends VideoBase {
 			try {
 				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != "") {
 					let subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());
-
+					//added extra variable to resolve method
 					let textFormat = com.google.android.exoplayer2.Format.createTextSampleFormat(
 						null,
 						com.google.android.exoplayer2.util.MimeTypes.APPLICATION_SUBRIP,
@@ -478,11 +478,11 @@ export class Video extends VideoBase {
 						com.google.android.exoplayer2.Format.NO_VALUE,
 						com.google.android.exoplayer2.Format.NO_VALUE,
 						"en",
-						null);
-
-					let subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource(
+						null,
+						com.google.android.exoplayer2.Format.OFFSET_SAMPLE_RELATIVE );
+						//previous  way was deprecated
+					let subtitlesSrc = new com.google.android.exoplayer2.source.SingleSampleMediaSource.Factory(dsf).createMediaSource(
 						subtitleUri,
-						dsf,
 						textFormat,
 						com.google.android.exoplayer2.C.TIME_UNSET);
 
