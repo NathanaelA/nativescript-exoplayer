@@ -1,24 +1,25 @@
-import utils = require("utils/utils");
+const utils = require("utils/utils");
 
 // This is used for definition purposes only, it does not generate JavaScript for it.
-import definition = require("./subtitle-source");
 
-export function fromResource(name: string): definition.SubtitleSource {
-    var video = new definition.SubtitleSource();
+import { SubtitleSource } from './subtitle-source';
+
+export function fromResource(name: string): SubtitleSource {
+    const video = new SubtitleSource();
     return video.loadFromResource(name) ? video : null;
 }
 
-export function fromFile(path: string): definition.SubtitleSource { 
-    var video = new definition.SubtitleSource();
+export function fromFile(path: string): SubtitleSource { 
+    const video = new SubtitleSource();
     return video.loadFromFile(path) ? video : null;
 }
 
-export function fromUrl(url: string): definition.SubtitleSource {
-    var video = new definition.SubtitleSource(); 
+export function fromUrl(url: string): SubtitleSource {
+    const video = new SubtitleSource();
     return video.loadFromUrl(url) ? video : null;
 }
 
-export function fromFileOrResource(path: string): definition.SubtitleSource {
+export function fromFileOrResource(path: string): SubtitleSource {
     if (!isFileOrResourcePath(path)) {
         throw new Error("Path \"" + "\" is not a valid file or resource.");
     }

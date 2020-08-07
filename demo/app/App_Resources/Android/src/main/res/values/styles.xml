@@ -10,8 +10,8 @@
         <item name="colorAccent">@color/ns_accent</item>
 
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        
-        <item name="android:windowActionBarOverlay">true</item>  
+
+        <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowTranslucentStatus">true</item>
 
     </style>
@@ -32,7 +32,7 @@
     <style name="AppTheme" parent="AppThemeBase">
     </style>
 
-    <!-- theme for actioon-bar -->
+    <!-- theme for action-bar -->
     <style name="NativeScriptToolbarStyleBase" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/ns_primary</item>
         <item name="theme">@style/ThemeOverlay.AppCompat.ActionBar</item>
@@ -40,6 +40,22 @@
 
     </style>
 
+
+    <style name="Theme1" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:textColorPrimary">#f00</item>
+        <item name="android:textColor">#f00</item>
+        <item name="actionMenuTextColor">#f00</item>
+        <item name="android:background">@color/dark_blue</item>
+    </style>
+
+    <style name="Theme2" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColorPrimary">#0f0</item>
+        <item name="android:textColor">#0f0</item>
+        <item name="actionMenuTextColor">#0f0</item>
+        <item name="android:background">@color/dark_red</item>
+    </style>
+
+
     <style name="NativeScriptToolbarStyle" parent="NativeScriptToolbarStyleBase">
     </style>
-</resources> 
+</resources>

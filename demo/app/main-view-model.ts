@@ -157,16 +157,22 @@ export class HelloWorldModel extends Observable {
   }
 
 
+  public encVideoSource() {
+  this._videoPlayer.encryption = "CTR";
+  this._videoPlayer.encryptionKey = "2BB80D537B1DA3E38BD30361AA855686BDE0EACD7162FEF6A25FE97BF527A25B";
+  this._videoPlayer.encryptionIV = "015E42FF678B2B90B743111A396EF850";
+  this._videoPlayer.src = "~/videos/video-ctr.enc";
+  }
 
   /**
    * Change the video src property
    */
   public changeVideoSource() {
-    //  this._videoPlayer.src = "~/videos/test_video_rotated.mp4";
-    //  return;
+    // Disable encryption if it is on...
+    this._videoPlayer.encryption = "";
 
-    if (this.videoSrc === "~/videos/small.mp4") {
-      this._videoPlayer.src = "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+    if (this.videoSrc === "~/videos/small.mp4" || this.videoSrc === "~/videos/video-ctr.enc") {
+      this._videoPlayer.src = "https://dash.akamaized.net/dash264/TestCases/1a/netflix/exMPD_BIP_TC1.mpd";
     } else {
       this._videoPlayer.src = "~/videos/small.mp4";
     }

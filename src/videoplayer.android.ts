@@ -1,8 +1,8 @@
 ﻿
 
 import { Video as VideoBase, VideoFill, videoSourceProperty, subtitleSourceProperty } from "./videoplayer-common";
-import * as nsUtils from "tns-core-modules/utils/utils";
-import * as nsApp from "tns-core-modules/application";
+import * as nsUtils from "utils/utils";
+import * as nsApp from "application";
 
 export * from "./videoplayer-common";
 
@@ -16,6 +16,8 @@ const STATE_ENDED: number = 4;
 
 const SURFACE_WAITING: number = 0;
 const SURFACE_READY: number = 1;
+
+
 
 export class Video extends VideoBase {
 	private _textureView: any; /// android.widget.VideoView
@@ -357,6 +359,12 @@ export class Video extends VideoBase {
 	}
 
 	private _detectTypeFromSrc(uri: any): number {
+
+		// If we are using Encryption, we wan the other path
+		if (this.encryption != null && this.encryption !== "") {
+			return this.TYPE.OTHER;
+		}
+
 		if (this.srcType > 0 && this.srcType <= 4) {
 			if (this.srcType == 1) return this.TYPE.SS;
 			if (this.srcType == 2) return this.TYPE.DASH;
@@ -375,6 +383,49 @@ export class Video extends VideoBase {
 				return this.TYPE.OTHER;
 		}
 	}
+
+	private _hex2bytes(hexString) {
+		if (hexString == null || hexString.length === 0) { return null; }
+		let kl = hexString.length;
+		let key = Array.create("byte", kl/2);
+		for (let i=0,j=0;i<kl;i+=2,j++) {
+			key[j] = parseInt(hexString.substr(i, 2), 16)
+		}
+		return key;
+	}
+
+	private _setupEncryptedDataSource(url, encryption, bm) {
+		if (encryption.toUpperCase() !== "CTR") {
+			// TODO: AES/CBC and AES/CFB also support parallelizable decryption which means random seek ability
+			// TODO: see https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+			throw new Error("Unknown Decryption type, CTR is current only supported");
+		}
+
+		const key = this._hex2bytes(this.encryptionKey);
+		const iv = this._hex2bytes(this.encryptionIV);
+
+		const keySpec = new javax.crypto.spec.SecretKeySpec(key, "AES");
+		const ivSpec = new javax.crypto.spec.IvParameterSpec(iv);
+
+		let cipher;
+		switch (encryption.toUpperCase()) {
+			case 'CFB':
+				cipher = javax.crypto.Cipher.getInstance("AES/CFB/NoPadding");
+				break;
+
+			case 'CBC':
+				cipher = javax.crypto.Cipher.getInstance("AES/CBC/NoPadding");
+				break;
+
+			case 'CTR':
+			default:
+			cipher = javax.crypto.Cipher.getInstance("AES/CTR/NoPadding");
+		}
+		cipher.init(javax.crypto.Cipher.DECRYPT_MODE,keySpec, ivSpec);
+
+		return new (<any>global).technology.master.exoplayer.EncryptedFileDataSourceFactory(cipher, keySpec, ivSpec, bm);
+	}
+
 
 	private _openVideo(): void {
 		if (this._src === null) {
@@ -411,7 +462,12 @@ export class Video extends VideoBase {
 			}
 
 
-			let dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
+			let dsf;
+			if (this.encryption == null || this.encryption === "") {
+				dsf = new com.google.android.exoplayer2.upstream.DefaultDataSourceFactory(this._context, "NativeScript", bm);
+			} else {
+				dsf = this._setupEncryptedDataSource(this._src, this.encryption, bm);
+			}
 			let ef = new com.google.android.exoplayer2.extractor.DefaultExtractorsFactory();
 
 			let vs, uri;
@@ -462,11 +518,11 @@ export class Video extends VideoBase {
 
 
 			} else {
+				// Used if you pass in an Actual Exoplayer media source...
 				vs = this._src;
 			}
 
 			// subtitles src
-
 			try {
 				if (this._subtitlesSrc != null && this._subtitlesSrc.trim() != "") {
 					let subtitleUri = android.net.Uri.parse(this._subtitlesSrc.trim());

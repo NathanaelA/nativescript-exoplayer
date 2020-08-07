@@ -1,7 +1,7 @@
 ﻿import * as videoSource from "./video-source/video-source";
 import * as subtitleSource from "./subtitle-source/subtitle-source";
-import { isFileOrResourcePath } from "tns-core-modules/utils/utils";
-import { isString } from "tns-core-modules/utils/types"
+import { isFileOrResourcePath } from "utils/utils";
+import { isString } from "utils/types"
 import { View, Property, booleanConverter } from "tns-core-modules/ui/core/view";
 import * as imageSource from "tns-core-modules/image-source";
 
@@ -103,11 +103,30 @@ export class Video extends View {
     public muted: boolean = false;
     public fill: VideoFill = VideoFill.default;
 
+    public encryptionKey: string = null;
+    public encryptionIV: string = null;
+    public encryption: string = "";
+
     public static IMAGETYPEMONO = 1;
     public static IMAGETYPESTEREOTOPBOTTOM = 2;
     public static IMAGETYPESTEREOLEFTRIGHT = 3;
-
 }
+
+export const encryptionKeyProperty = new Property<Video, any>({
+    name: "encryptionKey",
+});
+encryptionKeyProperty.register(Video);
+
+export const encryptionIVProperty = new Property<Video, any>({
+    name: "encryptionIV",
+});
+encryptionIVProperty.register(Video);
+
+export const encryptionProperty = new Property<Video, any>({
+    name: "encryption",
+});
+encryptionProperty.register(Video);
+
 
 export const srcProperty = new Property<Video, any>({
     name: "src",
