@@ -280,6 +280,10 @@ export class Video extends VideoBase {
     public setVolume(volume: number) {
         this._player.volume = volume;
     }
+    
+    public setPlaybackSpeed(speed: number) {
+        this._player.rate = speed;
+    }
 
     public destroy() {
 
