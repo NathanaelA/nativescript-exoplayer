@@ -182,7 +182,7 @@ iv =ED07304DF8D0D0AFA2EB9B13D75BD817
 
 
 ### Create the Encrypted video  file
-- openssl enc --nosalt -aes-256-ctr -in small.mp4 -out video.enc -base64 -K 2BB80D537B1DA3E38BD30361AA855686BDE0EACD7162FEF6A25FE97BF527A25B -iv 015E42FF678B2B90B743111A396EF850
+- openssl enc --nosalt -aes-256-ctr -in small.mp4 -out video.enc -K 2BB80D537B1DA3E38BD30361AA855686BDE0EACD7162FEF6A25FE97BF527A25B -iv 015E42FF678B2B90B743111A396EF850
 - - you can use `-S <your_salt_value>` to set the salt value instead of `--nosalt`  
 
 
