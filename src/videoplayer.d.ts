@@ -89,6 +89,12 @@ export declare class Video extends View {
    * @param {number} volume - Volume to set the video between 0 and 1
    */
   setVolume(volume: number): void;
+  
+   /**
+   * Set the playback speed of the video
+   * @param {number} speed - Set the playback speed in float value
+   */
+  setPlaybackSpeed(speed: number): void;
 
   /**
    * Destroy the video player and free up resources.
