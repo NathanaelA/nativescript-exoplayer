@@ -629,6 +629,13 @@ export class Video extends VideoBase {
 			this.mediaPlayer.setVolume(volume);
 		}
 	}
+	
+	public setPlaybackSpeed(speed: number) {
+		if (this.mediaPlayer) {
+			let playbackParams = new com.google.android.exoplayer2.PlaybackParameters(parseFloat(speed));
+			this.mediaPlayer.setPlaybackParameters(playbackParams);
+		}
+	}
 
 	public destroy() {
 		this.release();
