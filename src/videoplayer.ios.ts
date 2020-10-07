@@ -335,15 +335,18 @@ export class Video extends VideoBase {
     private _addPlaybackTimeObserver() {
         this._playbackTimeObserverActive = true;
         let _interval = CMTimeMake(1, 5);
-        this._playbackTimeObserver = this._player.addPeriodicTimeObserverForIntervalQueueUsingBlock(_interval, null, (currentTime) => {
-            let _seconds = CMTimeGetSeconds(currentTime);
-            let _milliseconds = _seconds * 1000.0;
-            this.notify({
-                eventName: Video.currentTimeUpdatedEvent,
-                object: this,
-                position: _milliseconds
-            });
-        })
+        if (this._player) {
+          // only if valid player instance
+          this._playbackTimeObserver = this._player.addPeriodicTimeObserverForIntervalQueueUsingBlock(_interval, null, (currentTime) => {
+              let _seconds = CMTimeGetSeconds(currentTime);
+              let _milliseconds = _seconds * 1000.0;
+              this.notify({
+                  eventName: Video.currentTimeUpdatedEvent,
+                  object: this,
+                  position: _milliseconds
+              });
+          })
+        }
     }
 
     private _removePlaybackTimeObserver() {
