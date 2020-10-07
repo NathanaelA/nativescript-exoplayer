@@ -77,7 +77,7 @@ function onImgSrcPropertyChanged(view, oldValue, newValue) {
 /**
  * Video aspect/fill handling
  */
-export enum VideoFill {
+export const enum VideoFill {
     default = "default",
     aspect = "aspect",
     aspectFill = "aspectFill"
@@ -90,6 +90,12 @@ export class Video extends View {
     public static seekToTimeCompleteEvent: string = "seekToTimeComplete";
     public static currentTimeUpdatedEvent: string = "currentTimeUpdated";
     public static chaptersLoadedEvent: string = "chaptersLoaded";
+
+    /**
+     * ignore modifying iOS AVAudioSession category change on initialization
+     * by default, auto changes to: AVAudioSessionCategoryPlayAndRecord
+     */
+    public static iosIgnoreAudioSessionChange: boolean = false;
 
     public _emit: any;
     public android: any;

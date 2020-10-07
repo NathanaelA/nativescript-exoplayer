@@ -40,17 +40,19 @@ export class Video extends VideoBase {
         super();
         this._playerController = new AVPlayerViewController();
 
-        let audioSession = AVAudioSession.sharedInstance();
-        let output = audioSession.currentRoute.outputs.lastObject.portType;
-        if (output.match(/Receiver/)) {
-            try {
-              audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
-              audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverride.Speaker);
-              audioSession.setActiveError(true);
-              //console.log("audioSession category set and active");
-            } catch (err) {
-              //console.log("setting audioSession category failed");
-            }
+        if (!Video.iosIgnoreAudioSessionChange) {
+          let audioSession = AVAudioSession.sharedInstance();
+          let output = audioSession.currentRoute.outputs.lastObject.portType;
+          if (output.match(/Receiver/)) {
+              try {
+                audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
+                audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverride.Speaker);
+                audioSession.setActiveError(true);
+                //console.log("audioSession category set and active");
+              } catch (err) {
+                //console.log("setting audioSession category failed");
+              }
+          }
         }
 
         this._player = new AVPlayer();
@@ -100,6 +102,12 @@ export class Video extends VideoBase {
 
     public _setNativeVideo(nativeVideoPlayer: any) {
         //console.log("Set native video: "+nativeVideoPlayer);
+        if (this._player == null) {
+          setTimeout(() => { 
+            this._setNativeVideo(nativeVideoPlayer);
+          }, 100);
+          return;
+        }
         if (nativeVideoPlayer != null) {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
@@ -129,6 +137,8 @@ export class Video extends VideoBase {
         this._src = nativePlayerSrc;
         let url: string = NSURL.URLWithString(this._src);
         this._player = new AVPlayer(url);
+        this._playerController.player = null;
+        this._playerController.player = this._player;
         //console.log("Video src: "+ this._src);
         this._init();
     }
@@ -211,7 +221,7 @@ export class Video extends VideoBase {
     }
 
     private AVPlayerItemDidPlayToEndTimeNotification(notification: any) {
-        if (this._player.currentItem && this._player.currentItem === notification.object) {
+        if (this._player && this._player.currentItem && this._player.currentItem === notification.object) {
             // This will match exactly to the object from the notification so can ensure only looping and finished event for the video that has finished.
             // Notification is structured like so: NSConcreteNotification 0x61000024f690 {name = AVPlayerItemDidPlayToEndTimeNotification; object = <AVPlayerItem: 0x600000204190, asset = <AVURLAsset: 0x60000022b7a0, URL = https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4>>}
             this._emit(VideoBase.finishedEvent);
@@ -227,7 +237,7 @@ export class Video extends VideoBase {
     public play() {
         if (this._videoFinished) {
             this._videoFinished = false;
-            this.seekToTime(CMTimeMake(5, 100));
+            this.seekToTime(0);
         }
 
         if (this.observeCurrentTime && !this._playbackTimeObserverActive) {
@@ -247,13 +257,15 @@ export class Video extends VideoBase {
     }
 
     public mute(mute: boolean) {
+      if (this._player) {
         this._player.muted = mute;
+      }
     }
 
     public seekToTime(ms: number) {
-        if (this._player.currentItem && this._player.currentItem.status === AVPlayerItemStatus.ReadyToPlay) {
-            let seconds = ms / 1000.0;
-            let time = CMTimeMakeWithSeconds(seconds, this._player.currentTime().timescale);
+      if (this._player) {
+        if (this._player.currentItem && this._player.currentItem.status === 1) {
+            let time = CMTimeMakeWithSeconds(ms, this._player.currentTime().timescale);
             try {
                 this._player.seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time, kCMTimeZero, kCMTimeZero, (isFinished) => {
                     this._emit(VideoBase.seekToTimeCompleteEvent);
@@ -264,10 +276,11 @@ export class Video extends VideoBase {
         } else {
             console.log("AVPlayerItem cannot service a seek request with a completion handler until its status is ReadyToPlay.")
         }
+      }
     }
 
     public getDuration(): number {
-        if (!this._player) {
+        if (!this._player || (this._player && this._player.currentItem == null)) {
             return 0;
         }
         let seconds = CMTimeGetSeconds(this._player.currentItem.asset.duration);
