@@ -102,7 +102,9 @@ export class Video extends View {
     public loop: boolean = false; /// whether the video loops the playback after extends
     public muted: boolean = false;
     public fill: VideoFill = VideoFill.default;
+    public backgroundAudio: boolean = false;
 
+    // Used for Android Encryption
     public encryptionKey: string = null;
     public encryptionIV: string = null;
     public encryption: string = "";
@@ -207,6 +209,13 @@ export const mutedProperty = new Property<Video, boolean>({
     valueConverter: booleanConverter,
 });
 mutedProperty.register(Video);
+
+export const backgroundAudioProperty = new Property<Video, boolean>({
+    name: "backgroundAudio",
+    valueConverter: booleanConverter,
+});
+backgroundAudioProperty.register(Video);
+
 
 export const fillProperty = new Property<Video, VideoFill>({
     name: "fill"

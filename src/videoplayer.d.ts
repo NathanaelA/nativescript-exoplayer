@@ -40,6 +40,7 @@ export declare class Video extends View {
    */
   loop: boolean;
   muted: boolean;
+  backgroundAudio: boolean;
 
   /**
    * aspect/fill settings

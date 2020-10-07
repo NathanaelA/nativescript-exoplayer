@@ -113,6 +113,10 @@ Mutes the native video player.
 
 Sets the native video player to loop once playback has finished.
 
+- **backgroundAudio - (boolean)** - *optional*
+
+If set to true, the audio for the video won't pause any existing audio playing. Instead it will play simultaneously with the existing audio. This is similar to how instagram and facebook play their video audio.
+
 - **fill - (VideoFill)** - *optional*
 
 Android: When set to VideoFill.aspectFill, the aspect ratio of the video will not be honored and it will fill the entire space available.
@@ -197,3 +201,5 @@ iv =ED07304DF8D0D0AFA2EB9B13D75BD817
 - Nathanael Anderson [@CongoCart](https://twitter.com/CongoCart)
 - Nathan Walker [@wwwalkerrun](https://twitter.com/wwwalkerrun)
 - Osie Fortune 
+- Alex Gritton 
+- gaudsonu98

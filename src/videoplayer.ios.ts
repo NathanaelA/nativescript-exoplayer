@@ -45,7 +45,7 @@ export class Video extends VideoBase {
         if (output.match(/Receiver/)) {
             try {
               audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
-              audioSession.overrideOutputAudioPortError(AVAudioSessionPortOverride.Speaker);
+              audioSession.overrideOutputAudioPortError(1936747378); //1936747378 =  AVAudioSessionPortOverride.Speaker
               audioSession.setActiveError(true);
               //console.log("audioSession category set and active");
             } catch (err) {
@@ -104,6 +104,7 @@ export class Video extends VideoBase {
             let currentItem = this._player.currentItem;
             this._addStatusObserver(nativeVideoPlayer);
             this._autoplayCheck();
+            this._backgroundAudioCheck();
             this._videoFinished = false;
             if (currentItem !== null) {
                 this._videoLoaded = false;
@@ -341,6 +342,22 @@ export class Video extends VideoBase {
     private _autoplayCheck() {
         if (this.autoplay) {
             this.play();
+        }
+    }
+
+    private _backgroundAudioCheck() {
+
+        try {
+            const audioSession = AVAudioSession.sharedInstance();
+            if (this.backgroundAudio) {
+                audioSession.setCategoryError(AVAudioSessionCategoryAmbient);
+            }
+            else {
+                audioSession.setCategoryError(AVAudioSessionCategoryPlayAndRecord);
+            }
+            audioSession.setActiveError(true);
+        } catch (err) {
+            // If for some reason we can't change where the audio is playing, we don't care...  :-)
         }
     }
 

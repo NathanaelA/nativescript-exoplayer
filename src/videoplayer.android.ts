@@ -41,7 +41,7 @@ export class Video extends VideoBase {
 	private _suspendLocation: number;
 	private _boundStart = this.resumeEvent.bind(this);
 	private _boundStop = this.suspendEvent.bind(this);
-	private enableSubtitles: boolean = false;
+	private _enableSubtitles: boolean = false;
 
 	public TYPE = { DETECT: 0, SS: 1, DASH: 2, HLS: 3, OTHER: 4 };
 	public nativeView: any;
@@ -123,15 +123,28 @@ export class Video extends VideoBase {
 		this._textureView.requestFocus();
 		nativeView.addView(this._textureView);
 
-		if (this.enableSubtitles) {
+		this._createSubtitleView(nativeView);
+
+		return nativeView;
+	}
+
+	get enableSubtitles() {
+		return this._enableSubtitles;
+	}
+	set enableSubtitles(value) {
+		this._enableSubtitles = !!value;
+		if (this._enableSubtitles) {
+			this._createSubtitleView(this.nativeView);
+		}
+	}
+
+	private _createSubtitleView(nativeView) {
+		if (this._enableSubtitles && !this._subtitlesView) {
 			this._subtitlesView = new com.google.android.exoplayer2.ui.SubtitleView(this._context);
 			this._subtitlesView.setUserDefaultStyle();
 			this._subtitlesView.setUserDefaultTextSize();
 			nativeView.addView(this._subtitlesView);
 		}
-
-
-		return nativeView;
 	}
 
 	public initNativeView(): void {
@@ -439,8 +452,11 @@ export class Video extends VideoBase {
 
 		this.videoOpened = true; // we don't want to come back in here from texture system...
 
-		let am = nsUtils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
-		am.requestAudioFocus(null, android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.AUDIOFOCUS_GAIN);
+		if (!this.backgroundAudio) {
+			let am = nsUtils.ad.getApplicationContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+			am.requestAudioFocus(null, android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.AUDIOFOCUS_GAIN);
+		}
+
 		try {
 			let bm = new com.google.android.exoplayer2.upstream.DefaultBandwidthMeter();
 			let trackSelection = new com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection.Factory(bm);
@@ -586,13 +602,12 @@ export class Video extends VideoBase {
 	}
 
 	public _updateSubtitles(subtitlesSrc: any): void {
-		if (this.enableSubtitles) {
-			this._subtitlesSrc = subtitlesSrc;
-			if (this.mediaPlayer != null) {
+		this.enableSubtitles = true;
+		this._subtitlesSrc = subtitlesSrc;
+		if (this.mediaPlayer != null) {
 				this.preSeekTime = this.mediaPlayer.getCurrentPosition();
-			}
-			this._openVideo();
 		}
+		this._openVideo();
 	}
 
 	public play(): void {
@@ -688,7 +703,7 @@ export class Video extends VideoBase {
 	
 	public setPlaybackSpeed(speed: number) {
 		if (this.mediaPlayer) {
-			let playbackParams = new com.google.android.exoplayer2.PlaybackParameters(parseFloat(speed));
+			let playbackParams = new com.google.android.exoplayer2.PlaybackParameters(parseFloat((<any>speed)));
 			this.mediaPlayer.setPlaybackParameters(playbackParams);
 		}
 	}
