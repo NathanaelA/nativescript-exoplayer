@@ -3,6 +3,10 @@ import { Video as VideoBase, VideoFill, videoSourceProperty, fillProperty, subti
 
 export * from "./videoplayer-common";
 
+// https://stackoverflow.com/questions/40283596/ios-10-avplayer-shows-black-screen-when-playing-video?rq=1
+// https://stackoverflow.com/questions/50685681/avplayerviewcontroller-show-black-screen-some-times
+// https://stackoverflow.com/questions/40808377/avplayerlayer-shows-black-screen-but-sound-is-working/50736003
+
 declare const
     NSURL,
     NSDictionary,
@@ -282,6 +286,10 @@ export class Video extends VideoBase {
         if (this._player) {
           this._player.volume = volume;
         }
+    }
+    
+    public setPlaybackSpeed(speed: number) {
+        this._player.rate = speed;
     }
 
     public destroy() {

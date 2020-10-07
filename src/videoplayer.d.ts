@@ -18,6 +18,7 @@ export declare class Video extends View {
    * video source file
    */
   src: string;
+  srcType: number;
   imgSrc: string;
   imgType: number;
   subtitles: string;
@@ -78,12 +79,6 @@ export declare class Video extends View {
   getCurrentTime(): number;
 
   /**
-   * Boolean to determine if observable for current time is registered.
-   * @param {boolean} observeCurrentTime - True to set observable on current time.
-   */
-  observeCurrentTime(observeCurrentTime: boolean): void;
-
-  /**
    * Observable for current time of the video duration in milliseconds.
    * @returns {number} Current time of the video duration.
    */
@@ -94,6 +89,12 @@ export declare class Video extends View {
    * @param {number} volume - Volume to set the video between 0 and 1
    */
   setVolume(volume: number): void;
+  
+   /**
+   * Set the playback speed of the video
+   * @param {number} speed - Set the playback speed in float value
+   */
+  setPlaybackSpeed(speed: number): void;
 
   /**
    * Destroy the video player and free up resources.

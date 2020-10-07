@@ -1,25 +1,10 @@
-﻿import types = require("utils/types");
-import definition = require("./subtitle-source");
-import common = require("./subtitle-source-common");
-import * as utilsModule from "utils/utils";
-import * as fileSystemModule from "file-system";
-import * as enumsModule from "ui/enums";
+﻿import definition = require("./subtitle-source");
+const types = require("utils/types");
+const utils = require("utils/utils");
+const  fs = require("file-system");
 
-global.moduleMerge(common, exports);
 
-var utils: typeof utilsModule;
-function ensureUtils() {
-    if (!utils) {
-        utils = require("utils/utils");
-    }
-}
-
-var fs: typeof fileSystemModule;
-function ensureFS() {
-    if (!fs) {
-        fs = require("file-system");
-    }
-}
+export * from './subtitle-source-common';
 
 declare var android: any;
 
@@ -29,8 +14,6 @@ export class SubtitleSource implements definition.SubtitleSource {
 
     public loadFromResource(name: string): boolean {
         this.android = null;
-
-        ensureUtils();
 
         var res = utils.ad.getApplicationContext().getResources();
         if (res) {
@@ -49,8 +32,6 @@ export class SubtitleSource implements definition.SubtitleSource {
     }
 
     public loadFromFile(path: string): boolean {
-
-        ensureFS();
 
         var fileName = types.isString(path) ? path.trim() : "";
         if (fileName.indexOf("~/") === 0) {

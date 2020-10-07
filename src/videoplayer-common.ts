@@ -3,7 +3,6 @@ import * as subtitleSource from "./subtitle-source/subtitle-source";
 import { isFileOrResourcePath } from "tns-core-modules/utils/utils";
 import { isString } from "tns-core-modules/utils/types"
 import { View, Property, booleanConverter, EventData } from "tns-core-modules/ui/core/view";
-import * as imageSource from "tns-core-modules/image-source";
 
 // on Android we explicitly set propertySettings to None because android will invalidate its layout (skip unnecessary native call).
 // var AffectsLayout = platform.device.os === platform.platformNames.android ? dependencyObservable.PropertyMetadataSettings.None : dependencyObservable.PropertyMetadataSettings.AffectsLayout;
@@ -43,7 +42,7 @@ function onSubtitlesPropertyChanged(view, oldValue, newValue) {
     if (isString(newValue)) {
         let value = newValue.trim();
         video.subtitleSource = null;
-        if (isFileOrResourcePath(value)){
+        if (isFileOrResourcePath(value)) {
             video.subtitleSource = subtitleSource.fromFileOrResource(value);
         } else {
             video.subtitleSource = subtitleSource.fromUrl(value);
@@ -79,9 +78,9 @@ function onImgSrcPropertyChanged(view, oldValue, newValue) {
  * Video aspect/fill handling
  */
 export enum VideoFill {
-  default = "default",
-  aspect = "aspect",
-  aspectFill = "aspectFill"
+    default = "default",
+    aspect = "aspect",
+    aspectFill = "aspectFill"
 }
 
 export class Video extends View {
@@ -96,6 +95,7 @@ export class Video extends View {
     public android: any;
     public ios: any;
     public src: string; /// video source file
+    public srcType: number = 0; /// video source file type
     public imgSrc: string;
     public imgType: number = 1;
     public subtitles: string; /// subtitles source file
@@ -108,17 +108,41 @@ export class Video extends View {
     public fill: VideoFill = VideoFill.default;
     public detectChapters: boolean = false;
 
+    public encryptionKey: string = null;
+    public encryptionIV: string = null;
+    public encryption: string = "";
+
     public static IMAGETYPEMONO = 1;
     public static IMAGETYPESTEREOTOPBOTTOM = 2;
     public static IMAGETYPESTEREOLEFTRIGHT = 3;
-
 }
+
+export const encryptionKeyProperty = new Property<Video, any>({
+    name: "encryptionKey",
+});
+encryptionKeyProperty.register(Video);
+
+export const encryptionIVProperty = new Property<Video, any>({
+    name: "encryptionIV",
+});
+encryptionIVProperty.register(Video);
+
+export const encryptionProperty = new Property<Video, any>({
+    name: "encryption",
+});
+encryptionProperty.register(Video);
+
 
 export const srcProperty = new Property<Video, any>({
     name: "src",
     valueChanged: onSrcPropertyChanged
 });
 srcProperty.register(Video);
+
+export const srcTypeProperty = new Property<Video, any>({
+    name: "srcType"
+});
+srcTypeProperty.register(Video);
 
 export const imgSrcProperty = new Property<Video, any>({
     name: "imgSrc",

@@ -1,6 +1,6 @@
 {
     "name": "video-source",
-    "main": "video-source.js",
+    "main": "video-source",
     "typings": "video-source.d.ts",
     "version": "0.1.0",
     "nativescript": {

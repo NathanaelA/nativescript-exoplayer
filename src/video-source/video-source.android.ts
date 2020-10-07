@@ -1,34 +1,12 @@
-﻿import types = require("utils/types");
-import definition = require("./video-source");
-import common = require("./video-source-common");
-import * as utilsModule from "utils/utils";
-import * as fileSystemModule from "file-system";
-import * as enumsModule from "ui/enums";
+﻿import definition = require("./video-source");
 
-global.moduleMerge(common, exports);
+const app = require('@nativescript/core/application');
+const types = require("utils/types");
 
-var utils: typeof utilsModule;
-function ensureUtils() {
-    if (!utils) {
-        utils = require("utils/utils");
-    }
-}
+const utils = require("utils/utils");
+const fs = require("file-system");
 
-var fs: typeof fileSystemModule;
-function ensureFS() {
-    if (!fs) {
-        fs = require("file-system");
-    }
-}
-
-var enums: typeof enumsModule;
-function ensureEnums() {
-    if (!enums) {
-        enums = require("ui/enums");
-    }
-}
-
-declare var android, AVPlayer: any;
+export * from './video-source-common';
 
 export class VideoSource implements definition.VideoSource {
     public android: any; /// android.widget.VideoView
@@ -37,13 +15,10 @@ export class VideoSource implements definition.VideoSource {
     public loadFromResource(name: string): boolean {
         this.android = null;
 
-        ensureUtils();
-
-        var res = utils.ad.getApplicationContext().getResources();
+        const res = utils.ad.getApplicationContext().getResources();
         if (res) {
-            var UrlPath = "android.resource://org.nativescript.videoPlayer/R.raw." + name;
-            this.android = UrlPath;
-
+                const packageName = app.android.context.getPackageName();
+                this.android = `android.resource://${packageName}/R.raw.${name}`;
         }
 
         return this.android != null;
@@ -57,9 +32,7 @@ export class VideoSource implements definition.VideoSource {
 
     public loadFromFile(path: string): boolean {
 
-        ensureFS();
-
-        var fileName = types.isString(path) ? path.trim() : "";
+        let fileName = types.isString(path) ? path.trim() : "";
         if (fileName.indexOf("~/") === 0) {
             fileName = fs.path.join(fs.knownFolders.currentApp().path, fileName.replace("~/", ""));
         }
@@ -75,7 +48,7 @@ export class VideoSource implements definition.VideoSource {
 
 
     get height(): number {
-        if (this.android) {
+        if (this.android && typeof this.android.getHeight === 'function') {
             return this.android.getHeight();
         }
 
@@ -83,7 +56,7 @@ export class VideoSource implements definition.VideoSource {
     }
 
     get width(): number {
-        if (this.android) {
+        if (this.android && typeof this.android.getWidth === 'function') {
             return this.android.getWidth();
         }
 
