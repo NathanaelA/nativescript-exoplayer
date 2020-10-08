@@ -10,6 +10,11 @@ export declare class Video extends View {
   static playbackStartEvent: string;
   static seekToTimeCompleteEvent: string;
   static currentTimeUpdatedEvent: string;
+  /**
+   * ignore modifying iOS AVAudioSession category change on initialization
+   * by default, auto changes to: AVAudioSessionCategoryPlayAndRecord
+   */
+  static iosIgnoreAudioSessionChange: boolean;
   _emit: any;
   android: any;
   ios: any;
