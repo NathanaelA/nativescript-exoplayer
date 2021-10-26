@@ -1,6 +1,6 @@
 # NativeScript-ExoPlayer
 
-This repo has been depricated please use the new home here: https://github.com/nstudio/nativescript-plugins/
+The official NativeScript Exoplayer plugin 
 
 
 ## Developed by
