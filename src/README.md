@@ -35,6 +35,12 @@ The Google ExoPlayer adds about a meg and a half plugin to the Android applicati
 ## Installation
 From your command prompt/terminal go to your app's root folder and execute:
 
+### NativeScript 7+
+
+`ns plugin add @nstudio/nativescript-exoplayer`
+
+### NativeScript <7
+
 `tns plugin add nativescript-exoplayer`
 
 ## Usage
