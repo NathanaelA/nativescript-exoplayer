@@ -1,3 +1,6 @@
+# Archived
+See: https://fluentreports.com/blog/?p=1434
+
 # NativeScript-ExoPlayer
 
 The official NativeScript Exoplayer plugin 
